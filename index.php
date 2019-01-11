@@ -1,14 +1,3 @@
-<form>
-	<p>MAC: <input type="text" name="MAC" /></p>
-	<p>pass: <input type="text" name="Password" /></p>
-	<p>AVG_Humidity: <input type="text" name="AVG_H" /></p>
-	<p>Max_Humidity: <input type="text" name="MAX_H" /></p>
-	<p>Min_Humidity: <input type="text" name="MIN_H" /></p>
-	<p>AVG_Temperature: <input type="text" name="AVG_T" /></p>
-	<p>Max_Temperature: <input type="text" name="MAX_T" /></p>
-	<p>Min_Temperature: <input type="text" name="MIN_T" /></p>
-	<input type="submit" name="submit" value="Save">
-</form>
 <?php
 error_reporting(1);
 ini_set('display_errors', 'On');
@@ -24,13 +13,15 @@ $dbname = "TemperatureMeasureSite";
 $conn = new mysqli($servername, $username, $password, $dbname);
 // Check connection
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+	echo $username;
+	echo $password;
+	die("Connection failed: " . $conn->connect_error);
 }
 
 //ID  Sensor_ID Timestamp_Of_Reading  AVG_Humidity  Max_Humidity  Min_Humidity  AVG_Temperature Max_Temperature Min_Temperature
 
-$macadress = $_GET['MAC'];
-$pass = $_GET['Password'];
+$macadress = $_POST['MAC'];
+$pass = $_POST['Password'];
 
 $sensor_ID = 0;
 
@@ -38,7 +29,7 @@ $result = $conn->query("SELECT Sensor_Id,Sensor_Name,Mac_Address,Password FROM T
 if ($result->num_rows > 0) {
     // output data of each row
     while($row = $result->fetch_assoc()) {
-        if($row["Mac_Address"] == $macadress && $row["Password"] == $pass)
+		if($row["Mac_Address"] == $macadress && $row["Password"] == $pass)
         {
         	$sensor_ID = $row["Sensor_Id"];
         	break;
@@ -52,12 +43,12 @@ else
 
 if($sensor_ID != 0)
 {
-	$AVG_Humidity = $_GET['AVG_H'];
-	$Max_Humidity = $_GET['MAX_H'];
-	$Min_Humidity = $_GET['MIN_H'];
-	$AVG_Temperature = $_GET['AVG_T'];
-	$Max_Temperature = $_GET['MAX_T'];
-	$Min_Temperature = $_GET['MIN_T'];
+	$AVG_Humidity = $_POST['AVG_Humidity'];
+	$Max_Humidity = $_POST['Max_Humidity'];
+	$Min_Humidity = $_POST['Min_Humidity'];
+	$AVG_Temperature = $_POST['AVG_Temperature'];
+	$Max_Temperature = $_POST['Max_Temperature'];
+	$Min_Temperature = $_POST['Min_Temperature'];
 
 	$sql = "INSERT INTO TemperatureMeasureSite.Sensor_Readings (
 	Sensor_ID,
@@ -78,7 +69,7 @@ if($sensor_ID != 0)
 	$Min_Temperature
 	)";
 
-	echo "<p>".$sql."</p>";
+	//echo "<p>".$sql."</p>";
 
 	if ($conn->query($sql) === TRUE) {
 	    echo "New record created successfully";
@@ -87,4 +78,19 @@ if($sensor_ID != 0)
 	}
 }
 $conn->close();
+
+/*foreach ($_POST as $key => $value) {
+  echo '<p>'.$key.'</p>';
+  echo '<p>'.$value.'</p>';
+}*/
+
+/*foreach ($_GET as $key => $value) {
+  echo '<p>'.$key.'</p>';
+  echo '<p>'.$value.'</p>';
+}*/
+/*foreach (getallheaders()  as $key => $value) {
+  echo '<p>'.$key.' -> ';
+  echo $value.'</p>';
+  }
+*/
 ?>
