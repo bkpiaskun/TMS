@@ -6,7 +6,7 @@ ini_set('display_startup_errors', 'On');
 
 $servername = "localhost";
 $username = "SensorSite";
-$password = "SensorSite";
+$password = "kombo009";
 $dbname = "TemperatureMeasureSite";
 
 // Create connection
@@ -32,9 +32,12 @@ if ($result->num_rows > 0) {
 		if($row["Mac_Address"] == $macadress && $row["Password"] == $pass)
         {
         	$sensor_ID = $row["Sensor_Id"];
+		//echo "if "+$row["Mac_Address"]+" = "+$macaddress;
+		//echo "if "+$row["Password"]+" = "+$password;
         	break;
-        } 
+        }
     }
+    echo $row["Sensor_Name"];
 }
 else
 {
@@ -77,10 +80,28 @@ if($sensor_ID != 0)
 	    echo "Error: " . $sql . "<br>" . $conn->error;
 	}
 }
+
+if( $_GET["action"] == "DISP" )
+{
+	$result = $conn->query("select ID,Sensors.Sensor_Name,Timestamp_Of_Reading,AVG_Humidity,Max_Humidity,Min_Humidity, AVG_Temperature, Max_Temperature, Min_Temperature 
+from Sensor_Readings
+inner join Sensors
+on Sensor_Readings.Sensor_ID = Sensors.Sensor_Id");
+	$resultArray = array();
+	if ($result->num_rows > 0) {
+ 	   // output data of each row
+	    while($row = $result->fetch_assoc()) {
+		$resultArray[] = $row;
+	   }
+	}
+	echo json_encode($resultArray);
+}
+
+
 $conn->close();
 
 /*foreach ($_POST as $key => $value) {
-  echo '<p>'.$key.'</p>';
+  echo '<p>'.$key;
   echo '<p>'.$value.'</p>';
 }*/
 
