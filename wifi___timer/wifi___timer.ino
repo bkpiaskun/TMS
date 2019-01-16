@@ -9,46 +9,36 @@
 hw_timer_t * timer = NULL;
 volatile SemaphoreHandle_t timerSemaphore;
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
-
 volatile uint32_t isrCounter = 0;
 volatile uint32_t lastIsrAt = 0;
 
+float maxTemp = -50;
+float minTemp = 100;
+float minHum = 100;
+float maxHum = 0;
 
-String serverAddress = "http://192.168.0.58/?urlParameter=asd";  // server address
-//"http://example.com/index.html"
+
+String serverAddress = "https://intern.kluchens.eu/";
 int port = 80;
 
- 
 WiFiMulti wifi;
 int status = WL_IDLE_STATUS;
 String response;
 int statusCode = 0;
 
-
-
-
-// for DHT22, 
-//      VCC: 5V or 3V
-//      GND: GND
-//      DATA: 2
-int pinDHT22 = 5;
+int pinDHT22 = 5;               // pin 5
 SimpleDHT22 dht22(pinDHT22);
 
-
-  uint8_t measurementCount = 0;
-  float temp_temperature = 0;
-  float temp_humidity = 0;
-
+uint8_t measurementCount = 0;
+float temp_temperature = 0;
+float temp_humidity = 0;
 
 void IRAM_ATTR onTimer(){
-  // Increment the counter and set the time of ISR
   portENTER_CRITICAL_ISR(&timerMux);
   isrCounter++;
   lastIsrAt = millis();
   portEXIT_CRITICAL_ISR(&timerMux);
-  // Give a semaphore that we can check in the loop
   xSemaphoreGiveFromISR(timerSemaphore, NULL);
-  // It is safe to use digitalRead/Write here if you want to toggle an output
 }
 
 void setup() {
@@ -59,7 +49,10 @@ void setup() {
   timerSemaphore = xSemaphoreCreateBinary();
   timer = timerBegin(0, 80, true);
   timerAttachInterrupt(timer, &onTimer, true);
-  timerAlarmWrite(timer, 300000000, true);
+  int timerInSeconds = 30;
+  int MiliSeconds = 1000* timerInSeconds;
+  int MicroSeconds = 1000* MiliSeconds;
+  timerAlarmWrite(timer, MicroSeconds, true);
   timerAlarmEnable(timer);
 }
 
@@ -73,6 +66,10 @@ void loop() {
     Serial.print("Read DHT22 failed, err="); 
     Serial.println(err);
     } else {
+        if(minTemp > temperature) {minTemp = temperature;}
+        if(minHum > humidity) {minHum = humidity;}
+        if(maxTemp < temperature) {maxTemp = temperature;}
+        if(maxHum < humidity) {maxHum = humidity;}
        if(measurementCount == 0)
        {
           temp_temperature = (float)temperature;
@@ -88,83 +85,48 @@ void loop() {
             {
               temp_temperature = (float)temperature;
               temp_temperature = (float)humidity;
-            } else {
-              //temp_temperature = (temp_temperature + temperature) / 2;
-              //temp_temperature = (temp_temperature + humidity) / 2;
             }
           }
       }
     measurementCount++;  
   }
-
-
-
-  
-  // If Timer has fired
   if((wifi.run() == WL_CONNECTED)) {
     if (xSemaphoreTake(timerSemaphore, 0) == pdTRUE){
       uint32_t isrCount = 0, isrTime = 0;
-      // Read the interrupt count and time
       portENTER_CRITICAL(&timerMux);
       isrCount = isrCounter;
       isrTime = lastIsrAt;
       portEXIT_CRITICAL(&timerMux);
-      //  NOW I NEED TO CALCULATE SOME BITCH ASS STATS
-
-    HTTPClient http;
-    http.begin(serverAddress); //HTTP
-    http.addHeader("Content-Type","application/x-www-form-urlencoded");
-
-    int httpCode = http.POST(
-      "AVG_Humidity="+(String)temp_humidity+"&"+
-      "Max_Humidity="+(String)temp_humidity+"&"+
-      "Min_Humidity="+(String)temp_humidity+"&"+
-      "AVG_Temperature="+(String)temp_temperature+"&"+
-      "Max_Temperature="+(String)temp_temperature+"&"+
-      "Min_Temperature="+(String)temp_temperature+"&"+
-      "MAC="+WiFi.macAddress()+"&"+
-      "Password="+"ESPtrzecie"
-      );
-    //int httpCode = http.GET();
-    \
-    
-    
-
-//    Post.addHeader("operator", "text/plain");  
-//    Post.POST("Key=hi&val=jagrut1");
-    if(httpCode > 0) {
-            // HTTP header has been send and Server response header has been handled
-            Serial.printf("[HTTP] GET... code: %d\n", httpCode);
-
-            // file found at server
-            if(httpCode == HTTP_CODE_OK) {
-                String payload = http.getString();
-                Serial.println(payload);
-            }
-        } else {
-            Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
-        }
-    http.end();
-
-
-
-
-
-
-
-
-
-    Serial.print("Status code: ");
-    Serial.println(httpCode);
-    Serial.print("Response: ");
-    Serial.println(response);
-    Serial.println("Wait five seconds");
-    Serial.println(temp_humidity);
-    Serial.println(temp_temperature);
-    Serial.println(measurementCount);
-    temp_humidity = 0;
-    temp_temperature = 0;
-    measurementCount = 0;
+      HTTPClient http;
+      http.begin(serverAddress); //HTTP
+      http.addHeader("Content-Type","application/x-www-form-urlencoded");
+      int httpCode = http.POST(
+        "AVG_Humidity="+(String)temp_humidity+"&"+
+        "Max_Humidity="+(String)maxHum+"&"+
+        "Min_Humidity="+(String)minHum+"&"+
+        "AVG_Temperature="+(String)temp_temperature+"&"+
+        "Max_Temperature="+(String)maxTemp+"&"+
+        "Min_Temperature="+(String)minTemp+"&"+
+        "MAC="+WiFi.macAddress()+"&"+
+        "Password="+"ESPtrzecie"
+        );
+      if(httpCode > 0) {
+              Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+              if(httpCode == HTTP_CODE_OK) {
+                  String payload = http.getString();
+                  Serial.println(payload);
+              }
+          } else {
+              Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+          }
+        http.end();
+        Serial.print("Status code: ");
+        Serial.println(httpCode);
+        Serial.print("Response: ");
+        Serial.println(response);
+        temp_humidity = 0;
+        temp_temperature = 0;
+        measurementCount = 0;
     }
   }
 }
