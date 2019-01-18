@@ -127,6 +127,14 @@ void loop() {
         temp_humidity = 0;
         temp_temperature = 0;
         measurementCount = 0;
+
+        maxTemp = -50;
+        minTemp = 100;
+        minHum = 100;
+        maxHum = 0;
+
+
+        
     }
   }
 }
