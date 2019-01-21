@@ -6,7 +6,7 @@ ini_set('display_startup_errors', 'On');
 
 $servername = "localhost";
 $username = "SensorSite";
-$password = "kombo009";
+$password = "SensorSite";
 $dbname = "TemperatureMeasureSite";
 
 // Create connection
@@ -83,18 +83,46 @@ if($sensor_ID != 0)
 
 if( $_GET["action"] == "DISP" )
 {
-	$result = $conn->query("select ID,Sensors.Sensor_Name,Timestamp_Of_Reading,AVG_Humidity,Max_Humidity,Min_Humidity, AVG_Temperature, Max_Temperature, Min_Temperature 
-from Sensor_Readings
-inner join Sensors
-on Sensor_Readings.Sensor_ID = Sensors.Sensor_Id");
-	$resultArray = array();
-	if ($result->num_rows > 0) {
- 	   // output data of each row
-	    while($row = $result->fetch_assoc()) {
-		$resultArray[] = $row;
-	   }
+
+	if(!empty($_GET['from']))
+	{
+
+		$timestamp = date('Y-m-d G:i:s');
+		$timestamp2 = date($_GET['from']);
+		echo $timestamp;
+		echo "<br ?>";
+		echo $_GET['from'];
+		echo "<br ?>";
+		echo $timestamp2;
+
+		$result = $conn->query("select ID,Sensors.Sensor_Name,Timestamp_Of_Reading,AVG_Humidity,Max_Humidity,Min_Humidity, AVG_Temperature, Max_Temperature, Min_Temperature 
+	from Sensor_Readings
+	inner join Sensors
+	on Sensor_Readings.Sensor_ID = Sensors.Sensor_Id");
+		$resultArray = array();
+		if ($result->num_rows > 0) {
+	 	   // output data of each row
+		    while($row = $result->fetch_assoc()) {
+			$resultArray[] = $row;
+		   }
+		}
+		//echo json_encode($resultArray);			
 	}
-	echo json_encode($resultArray);
+	else 
+	{
+		$result = $conn->query("select ID,Sensors.Sensor_Name,Timestamp_Of_Reading,AVG_Humidity,Max_Humidity,Min_Humidity, AVG_Temperature, Max_Temperature, Min_Temperature 
+	from Sensor_Readings
+	inner join Sensors
+	on Sensor_Readings.Sensor_ID = Sensors.Sensor_Id");
+		$resultArray = array();
+		if ($result->num_rows > 0) {
+	 	   // output data of each row
+		    while($row = $result->fetch_assoc()) {
+			$resultArray[] = $row;
+		   }
+		}
+		echo json_encode($resultArray);		
+	}
 }
 
 
