@@ -87,26 +87,28 @@ if( $_GET["action"] == "DISP" )
 	if(!empty($_GET['from']))
 	{
 
-		$timestamp = date('Y-m-d G:i:s');
 		$timestamp2 = date($_GET['from']);
-		echo $timestamp;
-		echo "<br ?>";
-		echo $_GET['from'];
-		echo "<br ?>";
-		echo $timestamp2;
+		//echo $timestamp2;
 
 		$result = $conn->query("select ID,Sensors.Sensor_Name,Timestamp_Of_Reading,AVG_Humidity,Max_Humidity,Min_Humidity, AVG_Temperature, Max_Temperature, Min_Temperature 
 	from Sensor_Readings
 	inner join Sensors
-	on Sensor_Readings.Sensor_ID = Sensors.Sensor_Id");
+	on Sensor_Readings.Sensor_ID = Sensors.Sensor_Id
+	where Sensor_Readings.Timestamp_Of_Reading >= "."'".$timestamp2."';");
 		$resultArray = array();
+	/*	echo "select ID,Sensors.Sensor_Name,Timestamp_Of_Reading,AVG_Humidity,Max_Humidity,Min_Humidity, AVG_Temperature, Max_Temperature, Min_Temperature 
+	from Sensor_Readings
+	inner join Sensors
+	on Sensor_Readings.Sensor_ID = Sensors.Sensor_Id
+	where Sensor_Readings.Timestamp_Of_Reading >= "."'".$timestamp2."';";
+	*/
 		if ($result->num_rows > 0) {
 	 	   // output data of each row
 		    while($row = $result->fetch_assoc()) {
 			$resultArray[] = $row;
 		   }
 		}
-		//echo json_encode($resultArray);			
+		echo json_encode($resultArray);			
 	}
 	else 
 	{
