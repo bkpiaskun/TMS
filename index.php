@@ -3,41 +3,29 @@ error_reporting(1);
 ini_set('display_errors', 'On');
 ini_set('display_startup_errors', 'On');
 
-
 $servername = "localhost";
 $username = "SensorSite";
 $password = "kombo009";
 $dbname = "TemperatureMeasureSite";
 
-// Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
-// Check connection
 if ($conn->connect_error) {
 	echo $username;
 	echo $password;
 	die("Connection failed: " . $conn->connect_error);
 }
-
-//ID  Sensor_ID Timestamp_Of_Reading  AVG_Humidity  Max_Humidity  Min_Humidity  AVG_Temperature Max_Temperature Min_Temperature
-
 $macadress = $_POST['MAC'];
 $pass = $_POST['Password'];
-
 $sensor_ID = 0;
-
 $result = $conn->query("SELECT Sensor_Id,Sensor_Name,Mac_Address,Password FROM TemperatureMeasureSite.Sensors");
 if ($result->num_rows > 0) {
-    // output data of each row
     while($row = $result->fetch_assoc()) {
-		if($row["Mac_Address"] == $macadress && $row["Password"] == $pass)
+	if($row["Mac_Address"] == $macadress && $row["Password"] == $pass)
         {
         	$sensor_ID = $row["Sensor_Id"];
-		//echo "if "+$row["Mac_Address"]+" = "+$macaddress;
-		//echo "if "+$row["Password"]+" = "+$password;
         	break;
         }
     }
-    echo $row["Sensor_Name"];
 }
 else
 {
@@ -71,9 +59,6 @@ if($sensor_ID != 0)
 	$Max_Temperature,
 	$Min_Temperature
 	)";
-
-	//echo "<p>".$sql."</p>";
-
 	if ($conn->query($sql) === TRUE) {
 	    echo "New record created successfully";
 	} else {
@@ -83,27 +68,16 @@ if($sensor_ID != 0)
 
 if( $_GET["action"] == "DISP" )
 {
-
 	if(!empty($_GET['from']))
 	{
-
 		$timestamp2 = date($_GET['from']);
-		//echo $timestamp2;
-
 		$result = $conn->query("select ID,Sensors.Sensor_Name,Timestamp_Of_Reading,AVG_Humidity,Max_Humidity,Min_Humidity, AVG_Temperature, Max_Temperature, Min_Temperature 
 	from Sensor_Readings
 	inner join Sensors
 	on Sensor_Readings.Sensor_ID = Sensors.Sensor_Id
 	where Sensor_Readings.Timestamp_Of_Reading >= "."'".$timestamp2."';");
 		$resultArray = array();
-	/*	echo "select ID,Sensors.Sensor_Name,Timestamp_Of_Reading,AVG_Humidity,Max_Humidity,Min_Humidity, AVG_Temperature, Max_Temperature, Min_Temperature 
-	from Sensor_Readings
-	inner join Sensors
-	on Sensor_Readings.Sensor_ID = Sensors.Sensor_Id
-	where Sensor_Readings.Timestamp_Of_Reading >= "."'".$timestamp2."';";
-	*/
 		if ($result->num_rows > 0) {
-	 	   // output data of each row
 		    while($row = $result->fetch_assoc()) {
 			$resultArray[] = $row;
 		   }
@@ -113,15 +87,14 @@ if( $_GET["action"] == "DISP" )
 	else 
 	{
 		$result = $conn->query("select * from (
-	select ID,Sensors.Sensor_Name,Timestamp_Of_Reading,AVG_Humidity,Max_Humidity,Min_Humidity, AVG_Temperature, Max_Temperature,Min_Temperature
-	from Sensor_Readings
-	inner join Sensors
-	on Sensor_Readings.Sensor_ID = Sensors.Sensor_Id
-	order by ID desc limit 500) sub
-	order by ID asc");
+			select ID,Sensors.Sensor_Name,Timestamp_Of_Reading,AVG_Humidity,Max_Humidity,Min_Humidity, AVG_Temperature, Max_Temperature,Min_Temperature
+			from Sensor_Readings
+			inner join Sensors
+			on Sensor_Readings.Sensor_ID = Sensors.Sensor_Id
+			order by ID desc limit 500) sub
+			order by ID asc");
 		$resultArray = array();
 		if ($result->num_rows > 0) {
-	 	   // output data of each row
 		    while($row = $result->fetch_assoc()) {
 			$resultArray[] = $row;
 		   }
@@ -130,21 +103,26 @@ if( $_GET["action"] == "DISP" )
 	}
 }
 
+if($_GET['action'] == 'LAST')
+{
+	$result = $conn->query("Select ID,Sensors.Sensor_Name,Timestamp_Of_Reading,AVG_Humidity,Max_Humidity,Min_Humidity, AVG_Temperature, Max_Temperature,Min_Temperature
+		from Sensor_Readings
+		inner join Sensors
+		on Sensor_Readings.Sensor_ID = Sensors.Sensor_ID
+		where ID in (
+			select MAX(ID)
+		        from Sensor_Readings
+	                group by Sensor_ID)");
+        $resultArray = array();
+        if ($result->num_rows > 0) {
+		while($row = $result->fetch_assoc()) {
+                	$resultArray[] = $row;
+                }
+	}
+        echo json_encode($resultArray);
+}
+
 
 $conn->close();
 
-/*foreach ($_POST as $key => $value) {
-  echo '<p>'.$key;
-  echo '<p>'.$value.'</p>';
-}*/
-
-/*foreach ($_GET as $key => $value) {
-  echo '<p>'.$key.'</p>';
-  echo '<p>'.$value.'</p>';
-}*/
-/*foreach (getallheaders()  as $key => $value) {
-  echo '<p>'.$key.' -> ';
-  echo $value.'</p>';
-  }
-*/
 ?>
