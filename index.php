@@ -6,7 +6,7 @@ ini_set('display_startup_errors', 'On');
 
 $servername = "localhost";
 $username = "SensorSite";
-$password = "SensorSite";
+$password = "kombo009";
 $dbname = "TemperatureMeasureSite";
 
 // Create connection
@@ -112,10 +112,13 @@ if( $_GET["action"] == "DISP" )
 	}
 	else 
 	{
-		$result = $conn->query("select ID,Sensors.Sensor_Name,Timestamp_Of_Reading,AVG_Humidity,Max_Humidity,Min_Humidity, AVG_Temperature, Max_Temperature, Min_Temperature 
+		$result = $conn->query("select * from (
+	select ID,Sensors.Sensor_Name,Timestamp_Of_Reading,AVG_Humidity,Max_Humidity,Min_Humidity, AVG_Temperature, Max_Temperature,Min_Temperature
 	from Sensor_Readings
 	inner join Sensors
-	on Sensor_Readings.Sensor_ID = Sensors.Sensor_Id");
+	on Sensor_Readings.Sensor_ID = Sensors.Sensor_Id
+	order by ID desc limit 500) sub
+	order by ID asc");
 		$resultArray = array();
 		if ($result->num_rows > 0) {
 	 	   // output data of each row
