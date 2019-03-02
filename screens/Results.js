@@ -59,7 +59,7 @@ export default class Results extends Component<Props> {
               <Text style={styles.resultText}>{"Średnia temperatur: "+rowData.AVG_Temperature}</Text>
               <Text style={styles.resultText}>{"Maksymalna temperatura: "+rowData.Max_Temperature}</Text>
               <Text style={styles.resultText}>{"Minimalna temperatura: "+rowData.Min_Temperature}</Text>
-              
+
             </View>
           }
 
