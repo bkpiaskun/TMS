@@ -25,19 +25,6 @@ export default class Main extends Component<Props> {
     })
   }
 
-  openTest(screenName, id){
-
-    Navigation.push(this.props.componentId,{
-      component: {
-        name:screenName,
-        passProps: {
-          testId: id,
-        } 
-      }
-    })
-  }
-
-
 
   _retrieveData = async () => {
     try {
@@ -46,7 +33,7 @@ export default class Main extends Component<Props> {
         /* Don't open anything*/
       }else{
         // this.openScreen('Welcome')  <-- this crashes the app
-        setTimeout(()=>this.openScreen('Welcome'),420)
+        setTimeout(()=>this.openScreen('Welcome'),10000)
       }
     } catch (error) {
       alert(error);

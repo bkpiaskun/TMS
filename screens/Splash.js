@@ -1,8 +1,8 @@
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, TouchableWithoutFeedback} from 'react-native';
-
+import {Platform, StyleSheet, Text, View, TouchableWithoutFeedback} from 'react-native';
 import {Navigation} from 'react-native-navigation';
+import LottieView from 'lottie-react-native';
 import {styles} from '../styles.js'
 
 type Props = {};
@@ -16,22 +16,22 @@ export default class Splash extends Component<Props> {
     })
   }
 
+  componentDidMount(){
+    this.animation.play();
+    setTimeout(()=>this.goHome('Main'),4000)
+  }
+  
   render() {
-    setTimeout(()=>this.goHome('Main'),1234)
     return (
-      <TouchableWithoutFeedback onPress={()=>this.goHome('Main')}style={[styles.splash, styles.comntainer]}>
 
-        <View style={styles.splashHolder}>
+      <LottieView
+        ref={animation => {
+          this.animation = animation;
+        }}
+        source={require('../animations/loading3.json')}
+        style={{backgroundColor:'rgb(229,229,255)'}}
+      />
 
-          <Text style={styles.title}></Text>
-          <Image
-          style={styles.logo}
-          source={require('../img/pp.png')}
-          />
-
-        </View>
-
-      </TouchableWithoutFeedback>
     );
   }
 }
