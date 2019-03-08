@@ -1,6 +1,6 @@
 # Aplikacja mobilna ForeMe
 ---
-::: warning
+:::warning
 *Jak działa aplikacja?*
 :::
 
