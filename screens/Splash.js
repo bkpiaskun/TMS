@@ -29,7 +29,7 @@ export default class Splash extends Component<Props> {
           this.animation = animation;
         }}
         source={require('../animations/loading3.json')}
-        style={{backgroundColor:'rgb(229,229,255)'}}
+        style={{backgroundColor:'#ff7c38'}}
       />
 
     );

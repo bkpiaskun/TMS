@@ -4,7 +4,7 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: 'rgb(41,48,70)',
+    backgroundColor: '#FFFFFF',
     alignItems: 'stretch'
   },
   splash: {
@@ -14,30 +14,35 @@ export const styles = StyleSheet.create({
     backgroundColor: '#ffd69e',
   },
   splashHolder:{
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1
+    flex: 7,
+    backgroundColor: '#ff7c38',
+    justifyContent:'center',
+    alignItems:'center'
   },
   logo:{
-    width: 200,
-    height: 200
+    width:300,
+    height:300,
+    padding:20,
+    resizeMode:'contain'
   },
   scrollContainer: {
-    backgroundColor: '#ffd69e',
+    backgroundColor: '#71c9ce',
   },
   title: {
     fontWeight: "bold",
     fontFamily: "SourceSansPro-Black",
-    fontSize: 18
+    fontWeight:'bold',
+    color:'#FFFFFF',
   },
   p: {
     fontSize: 14
   },
   topBoi: {
+    justifyContent:'center',
     alignItems: 'center',
-    backgroundColor: 'rgb(139, 152, 201)',
-    borderBottomColor: 'rgb(78, 88, 125)',
-    borderBottomWidth: 2
+    fontSize: 20,
+    backgroundColor: '#e03e36',
+    flex:1,
   },
   headerText: {
     fontSize: 24,
@@ -48,17 +53,22 @@ export const styles = StyleSheet.create({
   chooseQuizButt: {
     margin: 16,
     padding: 12,
-    borderColor: '#755934',
-    borderWidth: 1,
-    alignItems: 'center',
+    width:300,
+    borderColor: '#FFFFFF',
+    backgroundColor:'#eb5000',
+    borderWidth: 3,
+    borderRadius: 20,
+    alignItems:'center'
   },
   listView:{
-  marginTop:20,
-},
+    marginTop:20,
+    backgroundColor:'blue',
+    flex:7,
+  },
 
 results:{
   borderWidth:2,
-  borderColor:'rgb(78, 88, 125)',
+  borderColor:'#700961',
   borderRadius:5,
   backgroundColor:"rgb(139, 152, 201)",
   margin:15,
