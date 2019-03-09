@@ -63,7 +63,7 @@ export default class Main extends Component<Props> {
 
           <Image
             style={styles.logo}
-            source={require('../img/pp.png')}
+            source={require('../img/logo.png')}
            />
           <Text style={styles.title}>Witamy w aplikacji ForeMe</Text>
           <Text style={styles.title}>Kliknij przycisk poniżej aby wyświetlić</Text>

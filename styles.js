@@ -20,8 +20,8 @@ export const styles = StyleSheet.create({
     alignItems:'center'
   },
   logo:{
-    width:300,
-    height:300,
+    width:200,
+    height:200,
     padding:20,
     resizeMode:'contain'
   },
@@ -31,7 +31,6 @@ export const styles = StyleSheet.create({
   title: {
     fontWeight: "bold",
     fontFamily: "SourceSansPro-Black",
-    fontWeight:'bold',
     color:'#FFFFFF',
   },
   p: {
@@ -61,25 +60,86 @@ export const styles = StyleSheet.create({
     alignItems:'center'
   },
   listView:{
-    marginTop:20,
-    backgroundColor:'blue',
+    flex:1
+  },
+  results:{
+    borderWidth:2,
+    borderColor:'#700961',
+    borderRadius:5,
+    backgroundColor:"#b80d57",
+    margin:15,
+    padding:15,
+  },
+
+  resultText:{
+    color:'rgb(255,255,255)',
+    fontSize:15,
+    fontFamily:"SourceSansPro-Black",
+    letterSpacing:1
+  },
+
+  measurementView:{
+    backgroundColor:'#ff7c37',
     flex:7,
   },
 
-results:{
-  borderWidth:2,
-  borderColor:'#700961',
-  borderRadius:5,
-  backgroundColor:"rgb(139, 152, 201)",
-  margin:15,
-  padding:15,
-},
+  // Drawer special
 
-resultText:{
-  color:'rgb(255,255,255)',
-  fontSize:15,
-  fontFamily:"SourceSansPro-Black",
-  letterSpacing:1
-}
+  drawerMainContainer:{
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'stretch',
+    backgroundColor: '#FFFFFF',
+  },
+
+  drawerHeader:{
+    flex:2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection:'row',
+    backgroundColor:"#4c0045",
+  },
+
+  drawerButtons:{
+    flex:6,
+    backgroundColor:"#6f0765",
+    paddingBottom:20,
+  },
+
+  drawerButton:{
+    marginTop:30,
+    marginLeft: 0,
+    width:300,
+    height:70,
+    backgroundColor:'#f16821',
+    borderTopRightRadius: 50,
+    borderBottomRightRadius:50,
+    borderColor:'#FFFFFF',
+    borderWidth:2,
+    borderLeftWidth:0,
+    alignItems:'center',
+    justifyContent:'center'
+  },
+
+  drawerButtonText:{
+    fontWeight: "bold",
+    fontFamily: "SourceSansPro-Black",
+    color:'#FFFFFF',
+    fontSize:25,
+  },
+
+  drawerHeaderText:{
+    color:"white",
+    margin:20,
+    fontSize:30,
+    fontFamily:'Pacifico-Regular'
+  },
+
+  drawerLogo:{
+    width:100,
+    height:100,
+    padding:20,
+    resizeMode:'contain'
+  }
 
 })

@@ -26,28 +26,34 @@ export default class Drawer extends Component<Props> {
 
   render() {
     return (
-      <View style={styles.container}>
-
-        <View style={styles.topBoi}>
-          <Text style={styles.headerText}>Main Menu</Text>
+      <View style={styles.drawerMainContainer}>
+        <View style={styles.drawerHeader}>
           <Image
-            style={{width: 200, height: 200}}
-            source={require('../img/pp.png')}
+            style={styles.drawerLogo}
+            source={require('../img/drawerIco.png')}
             />
+          <Text style={styles.drawerHeaderText}>Szybki dostęp</Text>
+          
         </View>
+        <View style={styles.drawerButtons}>
 
-        <ScrollView vertical={true} style={styles.scrollContainer}>
-          <View>
+          <TouchableOpacity onPress = {()=>this.goToScreen("Main")} style={styles.drawerButton}>
+            <Text style={styles.drawerButtonText}>Ekran główny</Text>
+          </TouchableOpacity>
 
-            <Butt title={'Home'} func={()=>this.goToScreen('Main')}>
-            </Butt>
-            
-            <Butt title={'Wyniki pomiarów'} func={()=>this.openScreen('Results')}>
-            </Butt>
+          <TouchableOpacity onPress = {()=>this.goToScreen("Results")} style={styles.drawerButton}>
+            <Text style={styles.drawerButtonText}>Wyniki pomiarów</Text>
+          </TouchableOpacity>
 
-          </View>
-        </ScrollView>
+          <TouchableOpacity style={styles.drawerButton}>
+            <Text style={styles.drawerButtonText}>Test Button</Text>
+          </TouchableOpacity>
 
+          <TouchableOpacity style={styles.drawerButton}>
+            <Text style={styles.drawerButtonText}>Test Button 2</Text>
+          </TouchableOpacity>
+
+        </View>
       </View>
     );
   }

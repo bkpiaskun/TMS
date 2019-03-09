@@ -33,7 +33,7 @@ export default class Welcome extends Component<Props> {
 
         <Image
           style={styles.logo}
-          source={require('../img/pp.png')}
+          source={require('../img/logo.png')}
         />
           <Text style={styles.title}></Text>
 
