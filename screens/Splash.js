@@ -18,20 +18,20 @@ export default class Splash extends Component<Props> {
 
   componentDidMount(){
     this.animation.play();
-    setTimeout(()=>this.goHome('Main'),4000)
   }
   
   render() {
     return (
-
+    <View style={{backgroundColor:'#ff7c38',flex:1}}>
       <LottieView
         ref={animation => {
           this.animation = animation;
         }}
         source={require('../animations/loading3.json')}
-        style={{backgroundColor:'#ff7c38'}}
+        loop={false}
+        onAnimationFinish={() => this.goHome("Main")}
       />
-
+    </View>
     );
   }
 }

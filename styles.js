@@ -140,6 +140,17 @@ export const styles = StyleSheet.create({
     height:100,
     padding:20,
     resizeMode:'contain'
+  },
+
+  // Other stuff
+
+  errorMessage:{
+    fontWeight:'bold',
+    color:'#FFFFFF',
+    margin:10,
+    padding:10,
+    fontSize:20,
+    alignSelf:'center'
   }
 
 })

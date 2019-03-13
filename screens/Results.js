@@ -14,6 +14,7 @@ export default class Results extends Component<Props> {
       this.state = {
         refreshing: false,
         dataSource: ds,
+        error:" "
       };
   }
 
@@ -34,7 +35,11 @@ export default class Results extends Component<Props> {
           })
       })
       .catch((error) => {
-          console.error(error)
+          if(error = "Network request failed"){
+            this.setState({
+              error:"Brak połączenia z siecią!"
+            })
+          }
       });
   }
 
@@ -45,7 +50,8 @@ export default class Results extends Component<Props> {
           <Text style={styles.headerText}>Pomiary</Text>
         </View>
         <View style={styles.measurementView}> 
-          
+          <Text style={styles.errorMessage}> {this.state.error}</Text>
+
           <ListView
             style={styles.listView}
             dataSource={this.state.dataSource}
