@@ -4,14 +4,24 @@ import {Platform, StyleSheet, Text, View, TouchableWithoutFeedback} from 'react-
 import {Navigation} from 'react-native-navigation';
 import LottieView from 'lottie-react-native';
 import {styles} from '../styles.js'
+// import console = require('console');
 
 type Props = {};
+let randomAnimation = [require('../animations/loading1.json'),require('../animations/loading2.json'),require('../animations/loading3.json'),require('../animations/loading4.json')];
+
 export default class Splash extends Component<Props> {
+
+  constructor(){
+    super();
+    this.state = {
+      random: Math.floor((Math.random() * 4))
+    }
+  }
 
   goHome(screenName){
     Navigation.setStackRoot('AppStack',{
       component: {
-        name:screenName
+        name:screenName,
       }
     })
   }
@@ -27,7 +37,7 @@ export default class Splash extends Component<Props> {
         ref={animation => {
           this.animation = animation;
         }}
-        source={require('../animations/loading3.json')}
+        source={randomAnimation[this.state.random]}
         loop={false}
         onAnimationFinish={() => this.goHome("Main")}
       />

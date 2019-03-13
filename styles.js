@@ -83,7 +83,7 @@ export const styles = StyleSheet.create({
     flex:7,
   },
 
-  // Drawer special
+  // ---------------------------------------------------------- Drawer special ---------------------------------------------------------- 
 
   drawerMainContainer:{
     flex: 1,
@@ -94,6 +94,7 @@ export const styles = StyleSheet.create({
 
   drawerHeader:{
     flex:2,
+    padding:10,
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection:'row',
@@ -101,6 +102,7 @@ export const styles = StyleSheet.create({
   },
 
   drawerButtons:{
+    paddingRight:50,
     flex:6,
     backgroundColor:"#6f0765",
     paddingBottom:20,
@@ -109,12 +111,10 @@ export const styles = StyleSheet.create({
   drawerButton:{
     marginTop:30,
     marginLeft: 0,
-    width:300,
     height:70,
-    backgroundColor:'#f16821',
-    borderTopRightRadius: 50,
+    backgroundColor:'#76C43F',
     borderBottomRightRadius:50,
-    borderColor:'#FFFFFF',
+    borderColor:'#1F4B00',
     borderWidth:2,
     borderLeftWidth:0,
     alignItems:'center',
@@ -142,7 +142,7 @@ export const styles = StyleSheet.create({
     resizeMode:'contain'
   },
 
-  // Other stuff
+  // ----------------------------------------------------------  Other stuff ---------------------------------------------------------- 
 
   errorMessage:{
     fontWeight:'bold',
