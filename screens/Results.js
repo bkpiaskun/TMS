@@ -14,6 +14,7 @@ export default class Results extends Component<Props> {
       this.state = {
         refreshing: false,
         dataSource: ds,
+        error:" "
       };
   }
 
@@ -34,7 +35,11 @@ export default class Results extends Component<Props> {
           })
       })
       .catch((error) => {
-          console.error(error)
+          if(error = "Network request failed"){
+            this.setState({
+              error:"Brak połączenia z siecią!"
+            })
+          }
       });
   }
 
@@ -44,32 +49,35 @@ export default class Results extends Component<Props> {
         <View style={styles.topBoi}>
           <Text style={styles.headerText}>Pomiary</Text>
         </View>
+        <View style={styles.measurementView}> 
+          <Text style={styles.errorMessage}> {this.state.error}</Text>
 
           <ListView
-          style={styles.listView}
-          dataSource={this.state.dataSource}
-          renderRow={(rowData) =>
-            <View style={styles.results}>
-              <Text style={styles.resultText}>{"ID: "+rowData.ID}</Text>
-              <Text style={styles.resultText}>{"Nazwa Sensora: "+rowData.Sensor_Name}</Text>
-              <Text style={styles.resultText}>{"Data pomiaru: "+rowData.Timestamp_Of_Reading}</Text>
-              <Text style={styles.resultText}>{"Średnia wilgotności powietrza: "+rowData.AVG_Humidity}</Text>
-              <Text style={styles.resultText}>{"Maksymalna wilgotność powietrza: "+rowData.Max_Humidity}</Text>
-              <Text style={styles.resultText}>{"Minimalna wilgotność powietrza: "+rowData.Min_Humidity}</Text>
-              <Text style={styles.resultText}>{"Średnia temperatur: "+rowData.AVG_Temperature}</Text>
-              <Text style={styles.resultText}>{"Maksymalna temperatura: "+rowData.Max_Temperature}</Text>
-              <Text style={styles.resultText}>{"Minimalna temperatura: "+rowData.Min_Temperature}</Text>
-              
-            </View>
-          }
+            style={styles.listView}
+            dataSource={this.state.dataSource}
+            renderRow={(rowData) =>
+              <View style={styles.results}>
+                <Text style={styles.resultText}>{"ID: "+rowData.ID}</Text>
+                <Text style={styles.resultText}>{"Nazwa Sensora: "+rowData.Sensor_Name}</Text>
+                <Text style={styles.resultText}>{"Data pomiaru: "+rowData.Timestamp_Of_Reading}</Text>
+                <Text style={styles.resultText}>{"Średnia wilgotności powietrza: "+rowData.AVG_Humidity}</Text>
+                <Text style={styles.resultText}>{"Maksymalna wilgotność powietrza: "+rowData.Max_Humidity}</Text>
+                <Text style={styles.resultText}>{"Minimalna wilgotność powietrza: "+rowData.Min_Humidity}</Text>
+                <Text style={styles.resultText}>{"Średnia temperatur: "+rowData.AVG_Temperature}</Text>
+                <Text style={styles.resultText}>{"Maksymalna temperatura: "+rowData.Max_Temperature}</Text>
+                <Text style={styles.resultText}>{"Minimalna temperatura: "+rowData.Min_Temperature}</Text>
 
-            refreshControl={
-              <RefreshControl
-                refreshing={this.state.refreshing}
-                onRefresh={this._onRefresh}
-              />
+              </View>
             }
-          />
+
+              refreshControl={
+                <RefreshControl
+                  refreshing={this.state.refreshing}
+                  onRefresh={this._onRefresh}
+                />
+              }
+            />
+        </View> 
       </View>
     );
   }

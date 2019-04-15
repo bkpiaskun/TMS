@@ -4,7 +4,7 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#FFFFFF',
     alignItems: 'stretch'
   },
   splash: {
@@ -14,62 +14,143 @@ export const styles = StyleSheet.create({
     backgroundColor: '#ffd69e',
   },
   splashHolder:{
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1
+    flex: 7,
+    backgroundColor: '#ff7c38',
+    justifyContent:'center',
+    alignItems:'center'
   },
   logo:{
-    width: 200,
-    height: 200
+    width:200,
+    height:200,
+    padding:20,
+    resizeMode:'contain'
   },
   scrollContainer: {
-    backgroundColor: '#ffd69e',
+    backgroundColor: '#71c9ce',
   },
   title: {
     fontWeight: "bold",
     fontFamily: "SourceSansPro-Black",
-    fontSize: 18
+    color:'#FFFFFF',
   },
   p: {
     fontSize: 14
   },
   topBoi: {
+    justifyContent:'center',
     alignItems: 'center',
-    backgroundColor: '#ADFF2F',
-    borderBottomColor: '#755934',
-    borderBottomWidth: 2
+    fontSize: 20,
+    backgroundColor: '#e03e36',
+    flex:1,
   },
   headerText: {
     fontSize: 24,
     padding: 9,
+    color:"#FFFFFF",
     fontFamily: "SourceSansPro-Black",
   },
   chooseQuizButt: {
     margin: 16,
     padding: 12,
-    borderColor: '#755934',
-    borderWidth: 1,
-    alignItems: 'center',
+    width:300,
+    borderColor: '#FFFFFF',
+    backgroundColor:'#eb5000',
+    borderWidth: 3,
+    borderRadius: 20,
+    alignItems:'center'
   },
   listView:{
-  marginTop:20,
-},
+    flex:1
+  },
+  results:{
+    borderWidth:2,
+    borderColor:'#700961',
+    borderRadius:5,
+    backgroundColor:"#b80d57",
+    margin:15,
+    padding:15,
+  },
 
-results:{
-  borderWidth:2,
-  borderStyle:'dashed',
-  borderColor:'#FFFFFF',
-  borderRadius:5,
-  backgroundColor:"green",
-  margin:5,
-  padding:15,
-},
+  resultText:{
+    color:'rgb(255,255,255)',
+    fontSize:15,
+    fontFamily:"SourceSansPro-Black",
+    letterSpacing:1
+  },
 
-resultText:{
-  fontSize:15,
-  fontFamily:"SourceSansPro-Black",
-  letterSpacing:1
+  measurementView:{
+    backgroundColor:'#ff7c37',
+    flex:7,
+  },
 
-}
+  // ---------------------------------------------------------- Drawer special ---------------------------------------------------------- 
+
+  drawerMainContainer:{
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'stretch',
+    backgroundColor: '#FFFFFF',
+  },
+
+  drawerHeader:{
+    flex:2,
+    padding:10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection:'row',
+    backgroundColor:"#4c0045",
+  },
+
+  drawerButtons:{
+    paddingRight:50,
+    flex:6,
+    backgroundColor:"#6f0765",
+    paddingBottom:20,
+  },
+
+  drawerButton:{
+    marginTop:30,
+    marginLeft: 0,
+    height:70,
+    backgroundColor:'#76C43F',
+    borderBottomRightRadius:50,
+    borderColor:'#1F4B00',
+    borderWidth:2,
+    borderLeftWidth:0,
+    alignItems:'center',
+    justifyContent:'center'
+  },
+
+  drawerButtonText:{
+    fontWeight: "bold",
+    fontFamily: "SourceSansPro-Black",
+    color:'#FFFFFF',
+    fontSize:25,
+  },
+
+  drawerHeaderText:{
+    color:"white",
+    margin:20,
+    fontSize:30,
+    fontFamily:'Pacifico-Regular'
+  },
+
+  drawerLogo:{
+    width:100,
+    height:100,
+    padding:20,
+    resizeMode:'contain'
+  },
+
+  // ----------------------------------------------------------  Other stuff ---------------------------------------------------------- 
+
+  errorMessage:{
+    fontWeight:'bold',
+    color:'#FFFFFF',
+    margin:10,
+    padding:10,
+    fontSize:20,
+    alignSelf:'center'
+  }
 
 })
