@@ -15,6 +15,9 @@ Navigation.registerComponent('Welcome', () => Welcome);
 
 Navigation.events().registerAppLaunchedListener(() => {
   Navigation.setDefaultOptions({
+    layout: {
+      orientation: ['portrait']
+    },
     topBar: {
       elevation: 0,
       visible: false,
@@ -29,7 +32,6 @@ Navigation.events().registerAppLaunchedListener(() => {
         color: 'transparent'
       }
     },
-
   });
   Navigation.setRoot({
     root: {
