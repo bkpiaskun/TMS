@@ -37,7 +37,7 @@ export default class Results extends Component<Props> {
       .catch((error) => {
           if(error = "Network request failed"){
             this.setState({
-              error:"Brak połączenia z siecią!"
+              error:"Oops! Wystąpił problem. Spróbuj jeszcze raz"
             })
           }
       });
@@ -51,7 +51,6 @@ export default class Results extends Component<Props> {
         </View>
         <View style={styles.measurementView}> 
           <Text style={styles.errorMessage}> {this.state.error}</Text>
-
           <ListView
             style={styles.listView}
             dataSource={this.state.dataSource}

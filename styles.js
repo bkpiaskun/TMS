@@ -151,6 +151,65 @@ export const styles = StyleSheet.create({
     padding:10,
     fontSize:20,
     alignSelf:'center'
-  }
+  },
 
+  // ----------------------------------------------------------  OpenWeatgerMap ---------------------------------------------------------- 
+
+  searchView:{
+    backgroundColor:'#ff7c37',
+    flexDirection: "row",
+    alignContent:"stretch",
+    padding:5,
+    paddingTop:10
+  },
+
+  searchButton:{
+    justifyContent:"center",
+    alignItems:"center",
+    flex:1,
+    borderColor:"white",
+    borderWidth:1,
+    backgroundColor:"#990011",
+    borderRadius:5
+  },
+
+  searchBar:{
+    flex:5,
+    marginRight:5,
+    backgroundColor:"white",
+    borderRadius:5,
+    borderColor:"#990011",
+    borderWidth:1
+  },
+
+  weatherResult:{
+    borderWidth:4,
+    borderColor:'#700961',
+    borderRadius:5,
+    backgroundColor:"#FFF5EE",
+    margin:15,
+    flex:1
+  },
+
+  weatherResultText:{
+    color:'#000000',
+    fontSize:15,
+    fontFamily:"SourceSansPro-Black",
+    letterSpacing:1,
+    paddingBottom:5
+  },
+
+  weatherResultHeader:{
+    borderBottomWidth:1,
+    backgroundColor:"#FFFFFF",
+    alignItems:"center",
+    justifyContent:"center",
+    flex:1
+  },
+
+  weatherResultContent:{
+    alignItems:"center",
+    justifyContent:"center",
+    flex:5
+  }
 })

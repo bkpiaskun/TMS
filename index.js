@@ -6,12 +6,15 @@ import Results from './screens/Results.js'
 import Drawer from './screens/Drawer.js'
 import Splash from './screens/Splash.js'
 import Welcome from './screens/Welcome.js'
+import Weather from './screens/Weather.js'
+
 
 Navigation.registerComponent('Main', () => Main);
 Navigation.registerComponent('Results', () => Results);
 Navigation.registerComponent('Drawer', () => Drawer);
 Navigation.registerComponent('Splash', () => Splash);
 Navigation.registerComponent('Welcome', () => Welcome);
+Navigation.registerComponent('Weather', () => Weather);
 
 Navigation.events().registerAppLaunchedListener(() => {
   Navigation.setDefaultOptions({

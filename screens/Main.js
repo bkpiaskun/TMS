@@ -11,7 +11,6 @@ export default class Main extends Component<Props> {
 
   constructor(){
     super()
-  
   }
 
   openScreen(screenName){
@@ -69,6 +68,9 @@ export default class Main extends Component<Props> {
           <Text style={styles.title}>Kliknij przycisk poniżej aby wyświetlić</Text>
 
           <Butt title={'Wyniki pomiarów'} func={()=>this.openScreen('Results')}>
+          </Butt>
+          
+          <Butt title={'Pogoda dla Twojego miasta'} func={()=>this.openScreen('Weather')}>
           </Butt>
         </View>
 
