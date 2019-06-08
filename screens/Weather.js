@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View, TouchableOpacity, ListView, RefreshControl, TextInput, Image, Keyboard} from 'react-native';
 import {styles} from '../styles.js'
+import * as Animatable from 'react-native-animatable';
 
 export default class Weather extends Component<Props> {
 
@@ -25,7 +26,7 @@ export default class Weather extends Component<Props> {
           console.log(responseJson)
           this.setState({
             result: 
-              <View style={styles.weatherResult}>
+              <Animatable.View style={styles.weatherResult} animation="fadeIn">
                 <View style={styles.weatherResultHeader}>
                   <Text style={{alignSelf:"center", fontWeight:"bold", fontSize:22}}>{"Wyniki dla miasta "+responseJson.name + " ("+responseJson.sys.country+")"}</Text>
                 </View>
@@ -43,7 +44,7 @@ export default class Weather extends Component<Props> {
                       style={{width:60,height:60}}
                     />
                 </View>   
-              </View>
+              </Animatable.View>
             
           })
 

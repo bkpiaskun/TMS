@@ -1,4 +1,3 @@
-
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View, TouchableOpacity, AsyncStorage,Image} from 'react-native';
 import {Navigation} from 'react-native-navigation';
@@ -6,13 +5,16 @@ import {styles} from '../styles.js'
 import {QuizButt, Butt} from '../components/buttons.js'
 import ActionButton from 'react-native-circular-action-menu';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {Tooltip} from 'react-native-elements'
+import * as Animatable from 'react-native-animatable';
 
 type Props = {};
 export default class Main extends Component<Props> {
 
   constructor(){
     super()
+    this.state={
+      description:"Witamy w aplikacji ForeMe"
+    }
   }
 
   openScreen(screenName){
@@ -37,9 +39,6 @@ export default class Main extends Component<Props> {
     }
 }
 
-
- 
-
   render() {
 
     {this._retrieveData()}
@@ -55,8 +54,23 @@ export default class Main extends Component<Props> {
             style={styles.logo}
             source={require('../img/logo.png')}
            />
-          <Text style={styles.title}>Witamy w aplikacji ForeMe</Text>
-          <Text style={styles.title}>Kliknij przycisk poniżej aby wyświetlić</Text>
+          {/* <Text style={styles.title}>Witamy w aplikacji ForeMe</Text>
+          <Text style={styles.title}>Kliknij przycisk poniżej aby wyświetlić</Text> */}
+
+          <Animatable.Text
+            style={styles.title}
+            animation="fadeIn"
+            delay={500}
+          >
+            Witamy w aplikacji ForeMe
+          </Animatable.Text>
+          <Animatable.Text
+            style={styles.title}
+            animation="fadeIn"
+            delay={2500}
+          >
+            Kliknij przycisk aby rozpocząć
+          </Animatable.Text>
 
           <ActionButton 
               buttonColor="#eb5000" 
