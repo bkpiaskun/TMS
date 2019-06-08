@@ -4,7 +4,9 @@ import {Platform, StyleSheet, Text, View, TouchableOpacity, AsyncStorage,Image} 
 import {Navigation} from 'react-native-navigation';
 import {styles} from '../styles.js'
 import {QuizButt, Butt} from '../components/buttons.js'
-
+import ActionButton from 'react-native-circular-action-menu';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import {Tooltip} from 'react-native-elements'
 
 type Props = {};
 export default class Main extends Component<Props> {
@@ -20,7 +22,6 @@ export default class Main extends Component<Props> {
       }
     })
   }
-
 
   _retrieveData = async () => {
     try {
@@ -43,16 +44,6 @@ export default class Main extends Component<Props> {
 
     {this._retrieveData()}
 
-    // ActivityIndicator narazie niet
-
-    // if(this.state.isLoading){
-    //   return(
-    //     <View style={{flex: 1, padding: 20}}>
-    //       <ActivityIndicator/>
-    //     </View>
-    //   )
-    // }
-
     return (
       <View style={styles.container}>
         <View style={styles.topBoi}>
@@ -67,11 +58,21 @@ export default class Main extends Component<Props> {
           <Text style={styles.title}>Witamy w aplikacji ForeMe</Text>
           <Text style={styles.title}>Kliknij przycisk poniżej aby wyświetlić</Text>
 
-          <Butt title={'Wyniki pomiarów'} func={()=>this.openScreen('Results')}>
-          </Butt>
-          
-          <Butt title={'Pogoda dla Twojego miasta'} func={()=>this.openScreen('Weather')}>
-          </Butt>
+          <ActionButton 
+              buttonColor="#eb5000" 
+              btnOutRange="#eb5000"
+              radius={80}
+          >
+            <ActionButton.Item buttonColor='#170a45' onPress={()=>this.openScreen('Results')} >
+                <Icon name="thermometer-empty" style={styles.actionButtonItemsIcons}></Icon>
+            </ActionButton.Item>
+            <ActionButton.Item buttonColor='#170a45' onPress={()=>this.openScreen('Weather')}>
+                <Icon name="building" style={styles.actionButtonItemsIcons}></Icon>
+            </ActionButton.Item>
+            <ActionButton.Item buttonColor='#170a45' onPress={()=>this.openScreen('Authors')}>
+                <Icon name="users" style={styles.actionButtonItemsIcons}></Icon>
+            </ActionButton.Item>
+          </ActionButton>
         </View>
 
       </View>

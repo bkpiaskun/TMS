@@ -45,12 +45,12 @@ export default class Drawer extends Component<Props> {
             <Text style={styles.drawerButtonText}>Wyniki pomiarów</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.drawerButton}>
-            <Text style={styles.drawerButtonText}>Test Button</Text>
+          <TouchableOpacity onPress = {()=>this.goToScreen("Weather")} style={styles.drawerButton}>
+            <Text style={styles.drawerButtonText}>Pogoda dla miasta</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.drawerButton}>
-            <Text style={styles.drawerButtonText}>Test Button 2</Text>
+            <Text style={styles.drawerButtonText}>Autorzy</Text>
           </TouchableOpacity>
 
         </View>

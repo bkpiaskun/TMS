@@ -7,6 +7,7 @@ import Drawer from './screens/Drawer.js'
 import Splash from './screens/Splash.js'
 import Welcome from './screens/Welcome.js'
 import Weather from './screens/Weather.js'
+import Authors from './screens/Authors.js'
 
 
 Navigation.registerComponent('Main', () => Main);
@@ -15,6 +16,8 @@ Navigation.registerComponent('Drawer', () => Drawer);
 Navigation.registerComponent('Splash', () => Splash);
 Navigation.registerComponent('Welcome', () => Welcome);
 Navigation.registerComponent('Weather', () => Weather);
+Navigation.registerComponent('Authors', () => Authors);
+
 
 Navigation.events().registerAppLaunchedListener(() => {
   Navigation.setDefaultOptions({

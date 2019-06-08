@@ -83,6 +83,12 @@ export const styles = StyleSheet.create({
     flex:7,
   },
 
+  actionButtonItemsIcons:{
+    fontSize: 20,
+    height: 22,
+    color:"#FFFFFF"
+  },
+
   // ---------------------------------------------------------- Drawer special ---------------------------------------------------------- 
 
   drawerMainContainer:{
@@ -102,29 +108,27 @@ export const styles = StyleSheet.create({
   },
 
   drawerButtons:{
-    paddingRight:50,
     flex:6,
     backgroundColor:"#6f0765",
-    paddingBottom:20,
   },
 
   drawerButton:{
-    marginTop:30,
-    marginLeft: 0,
+    margin:30,
+    marginBottom:5,
     height:70,
-    backgroundColor:'#76C43F',
-    borderBottomRightRadius:50,
-    borderColor:'#1F4B00',
-    borderWidth:2,
-    borderLeftWidth:0,
+    backgroundColor:'#FFFFFF',
+    borderColor:'#000000',
+    borderRadius:5,
+    borderWidth:5,
     alignItems:'center',
     justifyContent:'center'
   },
 
   drawerButtonText:{
     fontWeight: "bold",
+    fontStyle:"italic",
     fontFamily: "SourceSansPro-Black",
-    color:'#FFFFFF',
+    color:'#000000',
     fontSize:25,
   },
 
@@ -211,5 +215,22 @@ export const styles = StyleSheet.create({
     alignItems:"center",
     justifyContent:"center",
     flex:5
-  }
+  },
+
+  // ----------------------------------------------------------  Authors ---------------------------------------------------------- 
+
+  authorsView:{
+    backgroundColor:'#ff7c37',
+    flex:7,
+    alignItems:'flex-start',
+    justifyContent:'space-between',
+    padding:20
+  },
+
+  forEachAuthor:{
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'space-between'
+  }, 
+   
 })
