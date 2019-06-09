@@ -230,7 +230,8 @@ export const styles = StyleSheet.create({
   forEachAuthor:{
     flexDirection:'row',
     alignItems:'center',
-    justifyContent:'space-between'
+    justifyContent:'space-between',
+    alignContent:'stretch',
   }, 
    
 })

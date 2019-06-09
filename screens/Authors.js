@@ -56,7 +56,7 @@ export default class Authors extends Component<Props> {
               <Animatable.Text 
                 animation={this.state.actionA1} 
                 direction="alternate"
-                style={{marginLeft:40, fontSize:20, fontWeight:'bold', color:'#FFFFFF'}}
+                style={{marginLeft:30, fontSize:20, fontWeight:'bold', color:'#FFFFFF'}}
               >
                 {this.state.author1Name}
               </Animatable.Text>

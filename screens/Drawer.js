@@ -36,7 +36,7 @@ export default class Drawer extends Component<Props> {
           
         </View>
         <View style={styles.drawerButtons}>
-
+      
           <TouchableOpacity onPress = {()=>this.goToScreen("Main")} style={styles.drawerButton}>
             <Text style={styles.drawerButtonText}>Ekran główny</Text>
           </TouchableOpacity>
