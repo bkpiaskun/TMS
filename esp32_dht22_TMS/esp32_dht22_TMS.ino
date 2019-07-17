@@ -5,6 +5,7 @@
 #include "SimpleDHT.h"
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
+#include "EEPROM.h"
 
 hw_timer_t * timer = NULL;
 volatile SemaphoreHandle_t timerSemaphore;
@@ -33,6 +34,12 @@ uint8_t measurementCount = 0;
 float temp_temperature = 0;
 float temp_humidity = 0;
 
+
+char str[50],ssid[30],key[30];
+int state = 0;
+int matches = 0;
+
+
 void IRAM_ATTR onTimer(){
   portENTER_CRITICAL_ISR(&timerMux);
   isrCounter++;
@@ -45,7 +52,26 @@ void setup() {
   WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
   delay(1000);
   Serial.begin(115200);
-  wifi.addAP("SushiSashimi", "StrzelajDoPolaka");
+  if (!EEPROM.begin(64)) {
+    Serial.println("Failed to initialise EEPROM");
+    Serial.println("Restarting...");
+    delay(1000);
+    ESP.restart();
+  }
+  for(int i = 0;i<20;i++)
+  {
+    ssid[i] = 0;
+    key[i] = 0;
+  }
+  for(int i = 0;i<50;i++)
+  {
+    str[i] = 0;
+  }
+  char __ssid[30];
+  EEPROM.readString(0).toCharArray(__ssid, sizeof(__ssid));
+  char __key[30];
+  EEPROM.readString(30).toCharArray(__key, sizeof(__key));
+  wifi.addAP(__ssid,__key);
   timerSemaphore = xSemaphoreCreateBinary();
   timer = timerBegin(0, 80, true);
   timerAttachInterrupt(timer, &onTimer, true);
@@ -57,8 +83,27 @@ void setup() {
 }
 
 void loop() {
-    delay(1000);
-    //################## CALCS
+ switch( state )
+  {
+    case 0:
+    TemperatureMeasurement();
+    break;
+    case 1:
+    PrepareConfig();
+    break;
+    case 2:
+    WaitForSaveConfirmation();
+    break;
+  }
+  if(Serial.available() && state == 0)
+  state = 1;
+  delay(1000);
+}
+
+void TemperatureMeasurement()
+{
+  
+
   float temperature = 0;
   float humidity = 0;
   int err = SimpleDHTErrSuccess;
@@ -90,13 +135,13 @@ void loop() {
       }
     measurementCount++;  
   }
-  if((wifi.run() == WL_CONNECTED)) {
-    if (xSemaphoreTake(timerSemaphore, 0) == pdTRUE){
-      uint32_t isrCount = 0, isrTime = 0;
-      portENTER_CRITICAL(&timerMux);
-      isrCount = isrCounter;
-      isrTime = lastIsrAt;
-      portEXIT_CRITICAL(&timerMux);
+  if (xSemaphoreTake(timerSemaphore, 0) == pdTRUE){
+    uint32_t isrCount = 0, isrTime = 0;
+    portENTER_CRITICAL(&timerMux);
+    isrCount = isrCounter;
+    isrTime = lastIsrAt;
+    portEXIT_CRITICAL(&timerMux);
+    if((wifi.run() == WL_CONNECTED)) {
       HTTPClient http;
       http.begin(serverAddress); //HTTP
       http.addHeader("Content-Type","application/x-www-form-urlencoded");
@@ -137,4 +182,82 @@ void loop() {
         
     }
   }
+}
+
+bool PrepareConfig()
+{
+  for (byte i=0; Serial.available(); i++){
+     str[i] = Serial.read();
+  }     
+  matches = sscanf (str,"@WIFI %s %s", &ssid,&key);
+  Serial.print("Matched ");Serial.print(matches);Serial.println(" credentials");
+  if(matches == 1)
+  {
+    Serial.print("Wifi SSID is: ");
+    Serial.println(ssid);
+    state = 2;
+    return true;
+  }  
+  if(matches == 2)
+  {
+    Serial.print("Wifi Key is: ");
+    Serial.println(key);
+    Serial.print("Wifi SSID is: ");
+    Serial.println(ssid);
+    state = 2;
+    return true;
+  }
+  state = 0;
+  return false;
+}
+
+void WaitForSaveConfirmation()
+{
+  Serial.println("To save changes print @SAVE, to reject print @REJECT");
+  if(matches == 1)
+  {
+    Serial.print("Wifi SSID is: ");
+    Serial.println(ssid);
+  }  
+  if(matches == 2)
+  {
+    Serial.print("Wifi Key is: ");
+    Serial.println(key);
+    Serial.print("Wifi SSID is: ");
+    Serial.println(ssid);
+  }
+  if(Serial.available())
+  {
+    String action = Serial.readString();
+    if(action == "@REJECT")
+    {
+      Serial.println("Reverting Changes");
+      for(int i = 0;i<20;i++)
+      {
+        ssid[i] = 0;
+        key[i] = 0;
+      }
+      for(int i = 0;i<50;i++)
+      {
+        str[i] = 0;
+      }
+    }
+    if(action == "@SAVE")
+    {
+      Serial.println("Saving Changes");      
+      CommitChanges();
+    }
+    state = 0;
+  }
+  delay(5000);
+}
+
+void CommitChanges()
+{
+  EEPROM.writeString(0,ssid);
+  yield();
+  EEPROM.writeString(sizeof(ssid),key);
+  yield();
+  EEPROM.commit();
+  Serial.println("Config Saved");
 }
