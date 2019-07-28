@@ -3,12 +3,9 @@ error_reporting(1);
 ini_set('display_errors', 'On');
 ini_set('display_startup_errors', 'On');
 
-$servername = "localhost";
-$username = "";
-$password = "";
-$dbname = "";
+include 'creds.php';
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+#conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
 //	echo $username;
 //	echo $password;
