@@ -4,23 +4,22 @@ ini_set('display_errors', 'On');
 ini_set('display_startup_errors', 'On');
 
 $servername = "localhost";
-$username = "SensorSite";
-$password = "kombo009";
-$dbname = "TemperatureMeasureSite";
+$username = "";
+$password = "";
+$dbname = "";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
-	echo $username;
-	echo $password;
-	die("Connection failed: " . $conn->connect_error);
+//	echo $username;
+//	echo $password;
+	die("INTERNAL ERROR");
 }
-$macadress = $_POST['MAC'];
 $pass = $_POST['Password'];
 $sensor_ID = 0;
 $result = $conn->query("SELECT Sensor_Id,Sensor_Name,Mac_Address,Password FROM TemperatureMeasureSite.Sensors");
 if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-	if($row["Mac_Address"] == $macadress && $row["Password"] == $pass)
+    while($row = $result->fetch_assoc()){
+	if($row["Mac_Address"] == $_POST['MAC'] && $row["Password"] == $pass)
         {
         	$sensor_ID = $row["Sensor_Id"];
         	break;
@@ -32,6 +31,8 @@ else
     echo "<p>żadnych sensorów nie ma<p>";
 }
 
+
+
 if($sensor_ID != 0)
 {
 	$AVG_Humidity = $_POST['AVG_Humidity'];
@@ -40,6 +41,19 @@ if($sensor_ID != 0)
 	$AVG_Temperature = $_POST['AVG_Temperature'];
 	$Max_Temperature = $_POST['Max_Temperature'];
 	$Min_Temperature = $_POST['Min_Temperature'];
+
+	if($AVG_Humidity == null)
+	{
+		$AVG_Humidity = -1;
+	}
+	if($Max_Humidity == null)
+	{
+		$Max_Humidity = -1;
+	}
+	if($Min_Humidity == null)
+	{
+		$Min_Humidity = -1;
+	}
 
 	$sql = "INSERT INTO TemperatureMeasureSite.Sensor_Readings (
 	Sensor_ID,
@@ -82,9 +96,9 @@ if( $_GET["action"] == "DISP" )
 			$resultArray[] = $row;
 		   }
 		}
-		echo json_encode($resultArray);			
+		echo json_encode($resultArray);
 	}
-	else 
+	else
 	{
 		$result = $conn->query("select * from (
 			select ID,Sensors.Sensor_Name,Timestamp_Of_Reading,AVG_Humidity,Max_Humidity,Min_Humidity, AVG_Temperature, Max_Temperature,Min_Temperature
@@ -99,20 +113,13 @@ if( $_GET["action"] == "DISP" )
 			$resultArray[] = $row;
 		   }
 		}
-		echo json_encode($resultArray);		
+		echo json_encode($resultArray);
 	}
 }
 
 if($_GET['action'] == 'LAST')
 {
-	$result = $conn->query("Select ID,Sensors.Sensor_Name,Timestamp_Of_Reading,AVG_Humidity,Max_Humidity,Min_Humidity, AVG_Temperature, Max_Temperature,Min_Temperature
-		from Sensor_Readings
-		inner join Sensors
-		on Sensor_Readings.Sensor_ID = Sensors.Sensor_ID
-		where ID in (
-			select MAX(ID)
-		        from Sensor_Readings
-	                group by Sensor_ID)");
+	$result = $conn->query("Select * from LAST_Measurements");
         $resultArray = array();
         if ($result->num_rows > 0) {
 		while($row = $result->fetch_assoc()) {
@@ -126,3 +133,4 @@ if($_GET['action'] == 'LAST')
 $conn->close();
 
 ?>
+
