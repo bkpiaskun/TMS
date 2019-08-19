@@ -116,7 +116,7 @@ if( $_GET["action"] == "DISP" )
 
 if($_GET['action'] == 'LAST')
 {
-	$result = $conn->query("Select * from LAST_Measurements");
+	$result = $conn->query("Select * from Measurements_With_Differences");
         $resultArray = array();
         if ($result->num_rows > 0) {
 		while($row = $result->fetch_assoc()) {
