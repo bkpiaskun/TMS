@@ -36,11 +36,24 @@ export default class Results extends Component<Props> {
       })
       .catch((error) => {
           if(error = "Network request failed"){
-            this.setState({
-              error:"Oops! Wystąpił problem. Spróbuj jeszcze raz"
-            })
+              fetch('http://intern.kluchens.eu/?action=LAST')
+              .then((response) => response.json())
+              .then((responseJson) => {
+                  this.setState({
+                      dataSource: ds.cloneWithRows(responseJson),
+                  })
+              })
+              .catch((error) => {
+                  if(error = "Network request failed"){
+                    this.setState({
+                      error:"Oops! Wystąpił problem. Spróbuj jeszcze raz"
+                    })
+                  }
+              });
           }
       });
+
+
   }
 
   render() {
