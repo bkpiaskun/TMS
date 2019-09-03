@@ -74,32 +74,35 @@ if($sensor_ID != 0)
 	    echo "Error: " . $sql . "<br>" . $conn->error;
 	}
 } else {
-	$sql = "INSERT INTO TemperatureMeasureSite.Sensor_Log (
-		Sensor_ID,
-		AVG_Humidity,
-		Max_Humidity,
-		Min_Humidity,
-		AVG_Temperature,
-		Max_Temperature,
-		Min_Temperature,
-		Mac_Address,
-		Password
-		)
-		VALUES (
-		$sensor_ID,
-		$AVG_Humidity,
-		$Max_Humidity,
-		$Min_Humidity,
-		$AVG_Temperature,
-		$Max_Temperature,
-		$Min_Temperature,
-		$mac,
-		$pass
-	)";
-	if ($conn->query($sql) === TRUE) {
-		echo "New record created successfully";
-	} else {
-		echo "Error: " . $sql . "<br>" . $conn->error;
+	if($mac != null && $pass != null)
+	{
+		$sql = "INSERT INTO TemperatureMeasureSite.Sensor_Log (
+			Sensor_ID,
+			AVG_Humidity,
+			Max_Humidity,
+			Min_Humidity,
+			AVG_Temperature,
+			Max_Temperature,
+			Min_Temperature,
+			Mac_Address,
+			Password
+			)
+			VALUES (
+			$sensor_ID,
+			$AVG_Humidity,
+			$Max_Humidity,
+			$Min_Humidity,
+			$AVG_Temperature,
+			$Max_Temperature,
+			$Min_Temperature,
+			$mac,
+			$pass
+		)";
+		if ($conn->query($sql) === TRUE) {
+			echo "New record created successfully";
+		} else {
+			echo "Error: " . $sql . "<br>" . $conn->error;
+		}
 	}
 }
 
