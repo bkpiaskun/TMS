@@ -18,17 +18,10 @@ export default class Results extends Component<Props> {
       };
   }
 
-  onRefresh = () => {
+  _onRefresh = () => {
     this.setState({refreshing: true});
-    fetchData().then(() => {
-      this.setState({refreshing: false});
-    });
-  }
-
-
-  componentDidMount(){
-    fetch('https://intern.kluchens.eu/?action=LAST')
-      .then((response) => response.json())
+    fetch('https://intern.kluchens.eu?action=MyLasts&UserName=piaskunbk&ApiKey=0')
+    .then((response) => response.json())
       .then((responseJson) => {
           this.setState({
               dataSource: ds.cloneWithRows(responseJson),
@@ -36,8 +29,8 @@ export default class Results extends Component<Props> {
       })
       .catch((error) => {
           if(error = "Network request failed"){
-              fetch('http://intern.kluchens.eu/?action=LAST')
-              .then((response) => response.json())
+            fetch('http://intern.kluchens.eu?action=MyLasts&UserName=piaskunbk&ApiKey=0')
+            .then((response) => response.json())
               .then((responseJson) => {
                   this.setState({
                       dataSource: ds.cloneWithRows(responseJson),
@@ -45,16 +38,55 @@ export default class Results extends Component<Props> {
               })
               .catch((error) => {
                   if(error = "Network request failed"){
-                    this.setState({
-                      error:"Oops! Wystąpił problem. Spróbuj jeszcze raz"
-                    })
+                          if(error = "Network request failed"){
+                            this.setState(
+                              { error:"Oops! Wystąpił problem. Spróbuj jeszcze raz" }
+                              )
+                          };
+                    }
                   }
-              });
+              )
+            }
           }
-      });
-
-
+      ).then(() => {
+      this.setState({refreshing: false});
+    });
+    
   }
+
+
+  componentDidMount(){
+    fetch('https://intern.kluchens.eu?action=MyLasts&UserName=piaskunbk&ApiKey=0')
+    .then((response) => response.json())
+      .then((responseJson) => {
+          this.setState({
+              dataSource: ds.cloneWithRows(responseJson),
+          })
+      })
+      .catch((error) => {
+          if(error = "Network request failed"){
+            fetch('http://intern.kluchens.eu?action=MyLasts&UserName=piaskunbk&ApiKey=0')
+            .then((response) => response.json())
+              .then((responseJson) => {
+                  this.setState({
+                      dataSource: ds.cloneWithRows(responseJson),
+                  })
+              })
+              .catch((error) => {
+                  if(error = "Network request failed"){
+                          if(error = "Network request failed"){
+                            this.setState(
+                              { error:"Oops! Wystąpił problem. Spróbuj jeszcze raz" }
+                              )
+                          };
+                    }
+                  }
+              )
+            }
+          }
+      )
+    };
+
 
   render() {
     return (
