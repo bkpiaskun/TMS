@@ -1,4 +1,5 @@
 <?php
+
 error_reporting(1);
 ini_set('display_errors', 'On');
 ini_set('display_startup_errors', 'On');
@@ -123,20 +124,36 @@ if($_GET['action'] == 'LAST')
 
 if($_GET['action'] == 'MyLasts')
 {
-	$UserName = $_POST['UserName'];
-	$ApiKey = $_POST['ApiKey'];
-	
-	$result = $conn->query("CALL Users_Last($UserName, $ApiKey)");
+	$UserName = $_GET['UserName'];
+	$ApiKey = $_GET['ApiKey'];
+	$sql = "CALL `xd`('".$ApiKey."','".$UserName."', @Xxxd );";
+	$result = $conn->query($sql);
+	$sql = "select @Xxxd";
+	$result = $conn->query($sql);
         $resultArray = array();
         if ($result->num_rows > 0) {
-		while($row = $result->fetch_assoc()) {
-                	$resultArray[] = $row;
-                }
+	$row = $result->fetch_row();
+	echo $row[0];
 	}
-        echo json_encode($resultArray);
 }
-
-
+if($_GET['action'] == 'validate')
+{
+	$UserName = $_GET['UserName'];
+	$ApiKey = $_GET['ApiKey'];
+	$UserValidation = "Failure";
+	$sql = "Select UserName,API_KEY from Users";
+	$result = $conn->query($sql);
+	if ($result->num_rows > 0) {
+	    while($row = $result->fetch_assoc()){
+	        if($row["UserName"] == $UserName && $row["API_KEY"] == $ApiKey)
+	        {
+			$UserValidation = "Success";
+	                break;
+	        }
+	    }
+	}
+	echo json_encode($UserValidation);
+}
 
 $conn->close();
 
