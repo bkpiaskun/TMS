@@ -272,10 +272,10 @@ if($_GET['action'] == 'showSensorAveraged')
 	$sensor_ID = $_GET['Sensor_ID'];
 
 	$sql = "SELECT 
-	  'dateDay',ttj.dateDay,
-	  'dateHour',ttj.dateHour,
-	  'AVG_Temperature',ttj.AVG_Temperature,
-	  'AVG_Humidity',ttj.AVG_Humidity
+	  ttj.dateDay,
+	  ttj.dateHour,
+	  ttj.AVG_Temperature,
+	  ttj.AVG_Humidity
 from (
 select
 	date(Timestamp_Of_Reading) dateDay,
@@ -291,7 +291,7 @@ FROM (
 		sr.Sensor_ID = '".$sensor_ID."'
 	) xd
 group by date(Timestamp_Of_Reading),(hour(Timestamp_Of_Reading))
-ORDER BY dateDay,dateHour DESC
+ORDER BY dateDay ASC,dateHour ASC
 ) ttj";
 	$result = $conn->query($sql);
 	$resultArray = array();
