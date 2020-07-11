@@ -305,7 +305,51 @@ ORDER BY dateDay ASC,dateHour ASC
 	}
 	echo json_encode($resultArray);
 }
+if($_GET['action'] == 'showAveragedData')
+{
+        $startDate = $_GET['StartDate'];
+        $endDate = $_GET['EndDate'];
+        $UserName = $_GET['UserName'];
+        $ApiKey = $_GET['ApiKey'];
 
+        $sql = "SELECT
+          ttj.dateDay,
+          ttj.dateHour,
+          ttj.AVG_Temperature,
+          ttj.AVG_Humidity,
+          ttj.Sensor_Name
+from (
+select
+        date(Timestamp_Of_Reading) dateDay,
+        (hour(Timestamp_Of_Reading)) dateHour,
+   avg(AVG_Temperature) AVG_Temperature,
+        avg(AVG_Humidity) AVG_Humidity,
+        Sensor_Name
+FROM (
+        SELECT Timestamp_Of_Reading,AVG_Temperature,AVG_Humidity,Sensor_Name
+        FROM Sensor_Readings sr
+        JOIN Sensors snrs
+        ON sr.Sensor_ID = snrs.Sensor_ID
+        JOIN Users usr
+        ON usr.User_ID = snrs.User_ID
+        WHERE
+                sr.Timestamp_Of_Reading >= '".$startDate."' AND
+                sr.Timestamp_Of_Reading <= '".$endDate."' AND
+                usr.UserName like '".$UserName."' AND
+                usr.API_KEY like '".$ApiKey."'
+        ) xd
+group BY Sensor_Name,date(Timestamp_Of_Reading),(hour(Timestamp_Of_Reading))
+ORDER BY Sensor_Name,dateDay ASC,dateHour ASC
+) ttj";
+        $result = $conn->query($sql);
+        $resultArray = array();
+        if ($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()) {
+                        $resultArray[] = $row;
+                }
+        }
+        echo json_encode($resultArray);
+}
 
 
 
