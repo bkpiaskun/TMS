@@ -1,5 +1,3 @@
-
-
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View, TouchableOpacity, ListView, RefreshControl} from 'react-native';
 import {styles} from '../styles.js'
@@ -101,16 +99,10 @@ export default class Results extends Component<Props> {
             dataSource={this.state.dataSource}
             renderRow={(rowData) =>
               <View style={styles.results}>
-                <Text style={styles.resultText}>{"ID: "+rowData.ID}</Text>
                 <Text style={styles.resultText}>{"Nazwa Sensora: "+rowData.Sensor_Name}</Text>
                 <Text style={styles.resultText}>{"Data pomiaru: "+rowData.Timestamp_Of_Reading}</Text>
                 <Text style={styles.resultText}>{"Średnia wilgotności powietrza: "+rowData.AVG_Humidity}</Text>
-                <Text style={styles.resultText}>{"Maksymalna wilgotność powietrza: "+rowData.Max_Humidity}</Text>
-                <Text style={styles.resultText}>{"Minimalna wilgotność powietrza: "+rowData.Min_Humidity}</Text>
                 <Text style={styles.resultText}>{"Średnia temperatur: "+rowData.AVG_Temperature}</Text>
-                <Text style={styles.resultText}>{"Maksymalna temperatura: "+rowData.Max_Temperature}</Text>
-                <Text style={styles.resultText}>{"Minimalna temperatura: "+rowData.Min_Temperature}</Text>
-
               </View>
             }
 
