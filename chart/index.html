@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Line Chart</title>
+	<meta charset="UTF-8"/>
+	<script src="chart.min.js"></script>
+	<script src="utils.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<style>
+	canvas{
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		-ms-user-select: none;
+	}
+	</style>
+</head>
+
+<body>
+	<label for="start">Data do sprawdzenia:</label>
+
+	<input type="date" id="start" name="trip-start">
+	<input type="button" id="showButton" value="Pokaż"/>
+	<input type="text" id="status" value="" disabled/>
+
+
+	<div style="width:100%;">
+		<canvas id="canvas"></canvas>
+	</div>
+	<br>
+	<br>
+
+	<script>
+		var config = {
+			type: 'line',
+			data: {
+				labels: ['00:00:00',
+						'01:00:00',
+						'02:00:00',
+						'03:00:00',
+						'04:00:00',
+						'05:00:00',
+						'06:00:00',
+						'07:00:00',
+						'08:00:00',
+						'09:00:00',
+						'10:00:00',
+						'11:00:00',
+						'12:00:00',
+						'13:00:00',
+						'14:00:00',
+						'15:00:00',
+						'16:00:00',
+						'17:00:00',
+						'18:00:00',
+						'19:00:00',
+						'20:00:00',
+						'21:00:00',
+						'22:00:00',
+						'23:00:00']
+			},
+			options: {
+				responsive: true,
+				title: {
+					display: true,
+					text: 'Wykres temperatur'
+				},
+				tooltips: {
+					mode: 'index',
+					intersect: false,
+				},
+				hover: {
+					mode: 'nearest',
+					intersect: true
+				},
+				scales: {
+					x: {
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Month'
+						}
+					},
+					y: {
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Value'
+						}
+					}
+				}
+			}
+		};
+
+		window.onload = function() {
+			document.getElementById("showButton").onclick = function() {showDataForSelectedDate(document.getElementById("start").value)};
+
+			var ctx = document.getElementById('canvas').getContext('2d');
+			window.myLine = new Chart(ctx, config);
+			
+			var d = new Date();
+			showDataForSelectedDate(d);
+		
+		};
+
+		function showDataForSelectedDate(dateP) {
+			document.getElementById("status").value = 'Sprawdzanie';
+
+			var d = new Date(dateP)
+				month = '' + (d.getMonth() + 1),
+				day = '' + d.getDate(),
+				year = d.getFullYear();
+
+			if(isNaN(d))
+			{
+				document.getElementById("status").value = 'Niepoprawna data';
+				return false;
+			}
+			
+			if (month.length < 2) 
+				month = '0' + month;
+			if (day.length < 2) 
+				day = '0' + day;
+			var date = [year, month, day].join('-');
+			
+			colors = [	    'rgba(255, 99, 132, 1)',
+							'rgba(54, 162, 235, 1)',
+							'rgba(255, 206, 86, 1)',
+							'rgba(75, 192, 192, 1)',
+							'rgba(153, 102, 255, 1)',
+							'rgba(255, 159, 64, 1)',
+							'rgba(255, 99, 132, 1)',
+							'rgba(54, 162, 235, 1)',
+							'rgba(255, 206, 86, 1)',
+							'rgba(75, 192, 192, 1)',
+							'rgba(153, 102, 255, 1)',
+							'rgba(255, 159, 64, 1)'];
+			
+			ajaxUrl = 'http://TMS.HOST/?action=showAveragedData&StartDate='+date+'%2000:00:00&EndDate='+date+'%2023:59:59&UserName=USERNAMEUSERNAME&ApiKey=APIKEYAPIKEY';
+		
+			$.ajax({ 
+				type: 'GET', 
+				url: ajaxUrl, 
+				data: { get_param: 'value' }, 
+				dataType: 'json',
+				success: function (data) { 
+					if(data.length > 0)
+					{
+						myLine.data.datasets = [];
+						myLine.update();
+
+						var sensorCount = 0,
+							lastSensor = data[0].Sensor_Name,
+							lastIndex = 0,
+							dataset = {
+									backgroundColor: '',
+									borderColor: '',
+									fill: false,
+									label: '',
+									data: []
+								};
+											
+						for (let index = 0; index < data.length; index++) {
+
+							if( data[index].Sensor_Name != lastSensor )
+							{
+								dataset.label = lastSensor;
+								dataset.backgroundColor = colors[sensorCount % colors.length]
+								dataset.borderColor = colors[sensorCount % colors.length]
+								myLine.data.datasets.push( dataset );
+								dataset = {
+									backgroundColor: '',
+									borderColor: '',
+									fill: false,
+									label: '',
+									data: []
+								};
+								sensorCount++;
+								lastSensor = data[index].Sensor_Name;
+								myLine.update();
+							}
+								
+							if((index - lastIndex) != data[index].dateHour)
+							{
+								let gap = data[index].dateHour -(index - lastIndex);
+								for(let x = 0; x < gap; x++)
+								{
+									lastIndex--;
+									dataset.data.push(null);
+								}
+							}
+							dataset.data.push(data[index].AVG_Temperature);
+						}
+						dataset.label = lastSensor;
+						dataset.backgroundColor = colors[sensorCount % colors.length]
+						dataset.borderColor = colors[sensorCount % colors.length]
+						myLine.data.datasets.push( dataset );
+						myLine.update();
+						document.getElementById("status").value = 'Dane wyświetlone';
+					}
+					else
+					{
+						document.getElementById("status").value = 'Brak danych';
+					}
+				}
+			});
+			myLine.update();
+		
+		}
+		
+	</script>
+</body>
+
+</html>

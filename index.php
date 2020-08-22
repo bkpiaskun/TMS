@@ -15,7 +15,7 @@ if ($conn->connect_error) {
 $pass = $_POST['Password'];
 $mac = $_POST['MAC'];
 $sensor_ID = 0;
-$result = $conn->query("SELECT Sensor_Id,Sensor_Name,Mac_Address,Password FROM TemperatureMeasureSite.Sensors");
+$result = $conn->query("SELECT Sensor_Id,Sensor_Name,Mac_Address,Password FROM Sensors");
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()){
 	if($row["Mac_Address"] == $mac && $row["Password"] == $pass)
@@ -54,7 +54,7 @@ if($sensor_ID != 0)
 		$Min_Humidity = -1;
 	}
 
-	$sql = "INSERT INTO TemperatureMeasureSite.Sensor_Readings (
+	$sql = "INSERT INTO Sensor_Readings (
 	Sensor_ID,
 	AVG_Humidity,
 	Max_Humidity,
@@ -80,7 +80,7 @@ if($sensor_ID != 0)
 } else {
 	if($mac != null && $pass != null)
 	{
-		$sql = "INSERT INTO TemperatureMeasureSite.Sensor_Log (
+		$sql = "INSERT INTO Sensor_Log (
 			Sensor_ID,
 			AVG_Humidity,
 			Max_Humidity,
