@@ -10,7 +10,7 @@ require 'creds.php';
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
-	die("INTERNAL ERROR");
+	die('[{"status": "Error"}]');
 }
 $pass = $_POST['Password'];
 $mac = $_POST['MAC'];
@@ -351,7 +351,10 @@ ORDER BY Sensor_Name,dateDay ASC,dateHour ASC
         echo json_encode($resultArray);
 }
 
-
+if($_GET['action'] == 'status')
+{
+	echo '[{"status": "Working"}]';
+}
 
 $conn->close();
 
