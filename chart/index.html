@@ -30,6 +30,7 @@
 	<br>
 	<br>
 
+	<script src="creds.js"></script>
 	<script>
 		var config = {
 			type: 'line',
@@ -136,7 +137,7 @@
 							'rgba(153, 102, 255, 1)',
 							'rgba(255, 159, 64, 1)'];
 			
-			ajaxUrl = 'http://TMS.HOST/?action=showAveragedData&StartDate='+date+'%2000:00:00&EndDate='+date+'%2023:59:59&UserName=USERNAMEUSERNAME&ApiKey=APIKEYAPIKEY';
+			ajaxUrl = serverUrl+'&StartDate='+date+'%2000:00:00&EndDate='+date+'%2023:59:59&UserName='+UserName+'&ApiKey='+ApiKey;
 		
 			$.ajax({ 
 				type: 'GET', 
@@ -161,7 +162,8 @@
 								};
 											
 						for (let index = 0; index < data.length; index++) {
-
+							
+							
 							if( data[index].Sensor_Name != lastSensor )
 							{
 								dataset.label = lastSensor;
@@ -180,7 +182,7 @@
 								lastIndex = index;
 								myLine.update();
 							}
-								
+
 							if((index - lastIndex) != data[index].dateHour)
 							{
 								let gap = data[index].dateHour -(index - lastIndex);
