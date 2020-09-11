@@ -1,5 +1,5 @@
-from flask import  render_template, flash, redirect, url_for, request, Response, jsonify
-from tms import app,db,bcrypt
+from flask import  request, Response, jsonify
+from tms import app,db
 from tms.models import User,Sensor,SensorLog,SensorReading
 
 @app.route('/', methods=['POST'])
