@@ -75,7 +75,7 @@ def last():
             ttable.max_temperature,
             ttable.min_temperature,
             now() - ttable.timestamp_of_reading AS difftime
-           FROM "LAST_Measurements" ttable) temptable1
+           FROM temperaturemeasuresite."LAST_Measurements" ttable) temptable1
   ORDER BY temptable1.difftime;""")
     readings_dict = []
     for read in SensorReadings:
@@ -117,8 +117,8 @@ def MyLasts():
     NOW() - ttable.Timestamp_Of_Reading AS diffTime
     FROM (
     SELECT *
-    FROM "RAW_Last_Measurements" rlm
-    JOIN Users us ON rlm.Sensor_Owner = us.User_ID
+    FROM temperaturemeasuresite."RAW_Last_Measurements" rlm
+    JOIN temperaturemeasuresite.Users us ON rlm.Sensor_Owner = us.User_ID
     WHERE us.UserName = :usr AND us.API_KEY = :api) ttable
     ) temptable1
     ORDER BY temptable1.diffTime) ttj;"""
@@ -135,8 +135,8 @@ def MyLasts():
                 ttable.Min_Temperature AS Min_Temperature
                 FROM (
                     SELECT *
-                    FROM "RAW_Last_Measurements" rlm
-                    JOIN Users us ON rlm.Sensor_Owner = us.User_ID
+                    FROM temperaturemeasuresite."RAW_Last_Measurements" rlm
+                    JOIN temperaturemeasuresite.Users us ON rlm.Sensor_Owner = us.User_ID
                     WHERE us.UserName = :usr AND us.API_KEY = :api
                 ) ttable
                 ORDER BY ttable.Timestamp_Of_Reading;"""
@@ -205,7 +205,7 @@ select
 	avg(AVG_Humidity) AVG_Humidity
 FROM (
 	SELECT Timestamp_Of_Reading,AVG_Temperature,AVG_Humidity
-	FROM Sensor_Readings sr
+	FROM temperaturemeasuresite.Sensor_Readings sr
 	WHERE 
 		sr.Timestamp_Of_Reading >= :sdate AND
 		sr.Timestamp_Of_Reading <= :edate and
@@ -252,10 +252,10 @@ select
     Sensor_Name
 FROM (
 	SELECT Timestamp_Of_Reading,AVG_Temperature,AVG_Humidity,Sensor_Name
-	FROM Sensor_Readings sr
-    JOIN Sensors snrs
+	FROM temperaturemeasuresite.Sensor_Readings sr
+    JOIN temperaturemeasuresite.Sensors snrs
     ON sr.Sensor_ID = snrs.Sensor_ID
-    JOIN Users usr
+    JOIN temperaturemeasuresite.Users usr
     ON usr.User_ID = snrs.User_ID
 	WHERE 
 		sr.Timestamp_Of_Reading >= :sdate AND
