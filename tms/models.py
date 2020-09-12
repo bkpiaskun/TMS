@@ -57,7 +57,7 @@ class SensorLog(Base):
     __table_args__ = {'schema': 'temperaturemeasuresite'}
 
     id = Column(BigInteger, primary_key=True, server_default=text("nextval('\"temperaturemeasuresite\".sensor_log_id_seq'::regclass)"))
-    sensor_id = Column(BigInteger, nullable=False, index=True)
+    sensor_id = Column(BigInteger, index=True)
     timestamp_of_reading = Column(DateTime(True))
     avg_humidity = Column(Float(53))
     max_humidity = Column(Float(53))

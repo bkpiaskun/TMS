@@ -14,3 +14,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://USER:PASSWORD@IPADDRESS:54
 db = SQLAlchemy(app)
 
 from tms import routes
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
