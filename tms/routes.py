@@ -101,7 +101,19 @@ def MyLasts():
     FROM (
     SELECT temptable1.ID AS ID,
     temptable1.Sensor_Name AS Sensor_Name, 
-	CONCAT( case when date_part('hour'::text, temptable1.diffTime) > 0 then CONCAT(date_part('hour'::text, temptable1.diffTime),' godzin ') else  ''  end, case when date_part('MINUTE'::text, temptable1.diffTime) > 0 then CONCAT(	date_part('MINUTE'::text, temptable1.diffTime),' minut ', round(date_part('SECOND'::text,temptable1.diffTime)),' sekund temu') end ) AS Timestamp_Of_Reading,
+	concat(
+        CASE
+            WHEN date_part('day'::text, temptable1.difftime) > 0::double precision THEN concat(date_part('day'::text, temptable1.difftime), ' dni ')
+            ELSE ''::text
+        END,
+        CASE
+            WHEN date_part('hour'::text, temptable1.difftime) > 0::double precision THEN concat(date_part('hour'::text, temptable1.difftime), ' godzin ')
+            ELSE ''::text
+        END,
+        CASE
+            WHEN date_part('minute'::text, temptable1.difftime) > 0::double precision THEN concat(date_part('minute'::text, temptable1.difftime), ' minut ')
+            ELSE ''::text
+        END, round(date_part('second'::text, temptable1.difftime))::text, ' sekund temu') AS timestamp_of_reading,
     temptable1.AVG_Humidity AS AVG_Humidity,
     temptable1.Max_Humidity AS Max_Humidity,
     temptable1.Min_Humidity AS Min_Humidity,
