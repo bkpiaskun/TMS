@@ -52,6 +52,10 @@ def last():
     temptable1.sensor_name,
     concat(
         CASE
+            WHEN date_part('day'::text, temptable1.difftime) > 0::double precision THEN concat(date_part('day'::text, temptable1.difftime), ' dni ')
+            ELSE ''::text
+        END,
+        CASE
             WHEN date_part('hour'::text, temptable1.difftime) > 0::double precision THEN concat(date_part('hour'::text, temptable1.difftime), ' godzin ')
             ELSE ''::text
         END,
