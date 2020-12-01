@@ -19,7 +19,7 @@ float minHum = 100;
 float maxHum = 0;
 
 
-String serverAddress = "https://intern.kluchens.eu/";
+String serverAddress = "http://intern.bkluska.eu/";
 int port = 80;
 
 WiFiMulti wifi;
@@ -35,12 +35,12 @@ float temp_temperature = 0;
 float temp_humidity = 0;
 
 
-char str[50],ssid[30],key[30];
+char str[50], ssid[30], key[30];
 int state = 0;
 int matches = 0;
 
 
-void IRAM_ATTR onTimer(){
+void IRAM_ATTR onTimer() {
   portENTER_CRITICAL_ISR(&timerMux);
   isrCounter++;
   lastIsrAt = millis();
@@ -58,12 +58,12 @@ void setup() {
     delay(1000);
     ESP.restart();
   }
-  for(int i = 0;i<20;i++)
+  for (int i = 0; i < 20; i++)
   {
     ssid[i] = 0;
     key[i] = 0;
   }
-  for(int i = 0;i<50;i++)
+  for (int i = 0; i < 50; i++)
   {
     str[i] = 0;
   }
@@ -71,134 +71,145 @@ void setup() {
   EEPROM.readString(0).toCharArray(__ssid, sizeof(__ssid));
   char __key[30];
   EEPROM.readString(30).toCharArray(__key, sizeof(__key));
-  wifi.addAP(__ssid,__key);
+  wifi.addAP(__ssid, __key);
   timerSemaphore = xSemaphoreCreateBinary();
   timer = timerBegin(0, 80, true);
   timerAttachInterrupt(timer, &onTimer, true);
   int timerInSeconds = 30;
-  int MiliSeconds = 1000* timerInSeconds;
-  int MicroSeconds = 1000* MiliSeconds;
+  int MiliSeconds = 1000 * timerInSeconds;
+  int MicroSeconds = 1000 * MiliSeconds;
   timerAlarmWrite(timer, MicroSeconds, true);
   timerAlarmEnable(timer);
 }
 
 void loop() {
- switch( state )
+  switch ( state )
   {
     case 0:
-    TemperatureMeasurement();
-    break;
+      TemperatureMeasurement();
+      break;
     case 1:
-    PrepareConfig();
-    break;
+      PrepareConfig();
+      break;
     case 2:
-    WaitForSaveConfirmation();
-    break;
+      WaitForSaveConfirmation();
+      break;
   }
-  if(Serial.available() && state == 0)
-  state = 1;
+  if (Serial.available() && state == 0)
+    state = 1;
   delay(1000);
 }
 
 void TemperatureMeasurement()
 {
-  
+
 
   float temperature = 0;
   float humidity = 0;
   int err = SimpleDHTErrSuccess;
   if ((err = dht22.read2(&temperature, &humidity, NULL)) != SimpleDHTErrSuccess) {
-    Serial.print("Read DHT22 failed, err="); 
+    Serial.print("Read DHT22 failed, err=");
     Serial.println(err);
+  } else {
+    if (minTemp > temperature) {
+      minTemp = temperature;
+    }
+    if (minHum > humidity) {
+      minHum = humidity;
+    }
+    if (maxTemp < temperature) {
+      maxTemp = temperature;
+    }
+    if (maxHum < humidity) {
+      maxHum = humidity;
+    }
+    if (measurementCount == 0)
+    {
+      temp_temperature = (float)temperature;
+      temp_humidity = (float)humidity;
     } else {
-        if(minTemp > temperature) {minTemp = temperature;}
-        if(minHum > humidity) {minHum = humidity;}
-        if(maxTemp < temperature) {maxTemp = temperature;}
-        if(maxHum < humidity) {maxHum = humidity;}
-       if(measurementCount == 0)
-       {
+      Serial.print("temp: " + (String)((float)temp_temperature));
+      Serial.println("humid " + (String)((float)temp_humidity));
+      if (measurementCount > 1) {
+        temp_temperature = (((float)(measurementCount - 1) * temp_temperature) + (float)temperature) / measurementCount;
+        temp_humidity = (((float)(measurementCount - 1) * temp_humidity) + (float)humidity) / measurementCount;
+      } else {
+        if (measurementCount == 0)
+        {
           temp_temperature = (float)temperature;
-          temp_humidity = (float)humidity;
-       } else {
-        Serial.print("temp: "+(String)((float)temp_temperature)); 
-        Serial.println("humid "+(String)((float)temp_humidity)); 
-          if(measurementCount > 1) {
-            temp_temperature = (((float)(measurementCount-1)*temp_temperature) + (float)temperature) / measurementCount;
-            temp_humidity = (((float)(measurementCount-1)*temp_humidity) + (float)humidity) / measurementCount;
-          } else {
-            if(measurementCount == 0)
-            {
-              temp_temperature = (float)temperature;
-              temp_temperature = (float)humidity;
-            }
-          }
+          temp_temperature = (float)humidity;
+        }
       }
-    measurementCount++;  
+    }
+    measurementCount++;
   }
-  if (xSemaphoreTake(timerSemaphore, 0) == pdTRUE){
+  if (xSemaphoreTake(timerSemaphore, 0) == pdTRUE) {
     uint32_t isrCount = 0, isrTime = 0;
     portENTER_CRITICAL(&timerMux);
     isrCount = isrCounter;
     isrTime = lastIsrAt;
     portEXIT_CRITICAL(&timerMux);
-    if((wifi.run() == WL_CONNECTED)) {
+    if ((wifi.run() == WL_CONNECTED)) {
       HTTPClient http;
       http.begin(serverAddress); //HTTP
-      http.addHeader("Content-Type","application/x-www-form-urlencoded");
+      http.addHeader("Content-Type", "application/x-www-form-urlencoded");
       int httpCode = http.POST(
-        "AVG_Humidity="+(String)temp_humidity+"&"+
-        "Max_Humidity="+(String)maxHum+"&"+
-        "Min_Humidity="+(String)minHum+"&"+
-        "AVG_Temperature="+(String)temp_temperature+"&"+
-        "Max_Temperature="+(String)maxTemp+"&"+
-        "Min_Temperature="+(String)minTemp+"&"+
-        "MAC="+WiFi.macAddress()+"&"+
-        "Password="+"ESPtrzecie"
-        );
-      if(httpCode > 0) {
-              Serial.printf("[HTTP] GET... code: %d\n", httpCode);
-              if(httpCode == HTTP_CODE_OK) {
-                  String payload = http.getString();
-                  Serial.println(payload);
-              }
-          } else {
-              Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
-          }
-        http.end();
-        Serial.print("Status code: ");
-        Serial.println(httpCode);
-        Serial.print("Response: ");
-        Serial.println(response);
-        temp_humidity = 0;
-        temp_temperature = 0;
-        measurementCount = 0;
+                       "AVG_Humidity=" + (String)temp_humidity + "&" +
+                       "Max_Humidity=" + (String)maxHum + "&" +
+                       "Min_Humidity=" + (String)minHum + "&" +
+                       "AVG_Temperature=" + (String)temp_temperature + "&" +
+                       "Max_Temperature=" + (String)maxTemp + "&" +
+                       "Min_Temperature=" + (String)minTemp + "&" +
+                       "MAC=" + WiFi.macAddress() + "&" +
+                       "Password=" + "ESPtrzecie"
+                     );
+      if (httpCode > 0) {
+        Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+        if (httpCode == HTTP_CODE_OK) {
+          String payload = http.getString();
+          Serial.println(payload);
+        }
+      } else {
+        Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+      }
+      http.end();
+      Serial.print("Status code: ");
+      Serial.println(httpCode);
+      Serial.print("Response: ");
+      Serial.println(response);
+      temp_humidity = 0;
+      temp_temperature = 0;
+      measurementCount = 0;
 
-        maxTemp = -50;
-        minTemp = 100;
-        minHum = 100;
-        maxHum = 0;
+      maxTemp = -50;
+      minTemp = 100;
+      minHum = 100;
+      maxHum = 0;
 
 
-        
+
+    } else {
+      Serial.println("Wifi not connected, restarting...");
+      ESP.restart();
     }
   }
 }
 
 bool PrepareConfig()
 {
-  for (byte i=0; Serial.available(); i++){
-     str[i] = Serial.read();
-  }     
-  matches = sscanf (str,"@WIFI %s %s", &ssid,&key);
-  Serial.print("Matched ");Serial.print(matches);Serial.println(" credentials");
-  if(matches == 1)
+  for (byte i = 0; Serial.available(); i++) {
+    str[i] = Serial.read();
+  }
+  matches = sscanf (str, "@WIFI %s %s", &ssid, &key);
+  Serial.print("Matched "); Serial.print(matches); Serial.println(" credentials");
+  if (matches == 1)
   {
     Serial.print("Wifi SSID is: ");
     Serial.println(ssid);
     state = 2;
     return true;
-  }  
-  if(matches == 2)
+  }
+  if (matches == 2)
   {
     Serial.print("Wifi Key is: ");
     Serial.println(key);
@@ -214,37 +225,37 @@ bool PrepareConfig()
 void WaitForSaveConfirmation()
 {
   Serial.println("To save changes print @SAVE, to reject print @REJECT");
-  if(matches == 1)
+  if (matches == 1)
   {
     Serial.print("Wifi SSID is: ");
     Serial.println(ssid);
-  }  
-  if(matches == 2)
+  }
+  if (matches == 2)
   {
     Serial.print("Wifi Key is: ");
     Serial.println(key);
     Serial.print("Wifi SSID is: ");
     Serial.println(ssid);
   }
-  if(Serial.available())
+  if (Serial.available())
   {
     String action = Serial.readString();
-    if(action == "@REJECT")
+    if (action == "@REJECT")
     {
       Serial.println("Reverting Changes");
-      for(int i = 0;i<20;i++)
+      for (int i = 0; i < 20; i++)
       {
         ssid[i] = 0;
         key[i] = 0;
       }
-      for(int i = 0;i<50;i++)
+      for (int i = 0; i < 50; i++)
       {
         str[i] = 0;
       }
     }
-    if(action == "@SAVE")
+    if (action == "@SAVE")
     {
-      Serial.println("Saving Changes");      
+      Serial.println("Saving Changes");
       CommitChanges();
     }
     state = 0;
@@ -254,9 +265,9 @@ void WaitForSaveConfirmation()
 
 void CommitChanges()
 {
-  EEPROM.writeString(0,ssid);
+  EEPROM.writeString(0, ssid);
   yield();
-  EEPROM.writeString(sizeof(ssid),key);
+  EEPROM.writeString(sizeof(ssid), key);
   yield();
   EEPROM.commit();
   Serial.println("Config Saved");
