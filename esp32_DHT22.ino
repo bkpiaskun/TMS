@@ -2,24 +2,19 @@
 #include <WiFi.h>
 #include <WiFiMulti.h>
 #include <HTTPClient.h>
-#include "SimpleDHT.h"
+#include <SimpleDHT.h>
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
 #include "EEPROM.h"
+#include "dht22_lib.h"
 
-hw_timer_t * timer = NULL;
+hw_timer_t *timer = NULL;
 volatile SemaphoreHandle_t timerSemaphore;
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 volatile uint32_t isrCounter = 0;
 volatile uint32_t lastIsrAt = 0;
 
-float maxTemp = -50;
-float minTemp = 100;
-float minHum = 100;
-float maxHum = 0;
-
-
-String serverAddress = "http://intern.bkluska.eu/";
+String serverAddress = "http://TMS.Server.org/";
 int port = 80;
 
 WiFiMulti wifi;
@@ -27,20 +22,20 @@ int status = WL_IDLE_STATUS;
 String response;
 int statusCode = 0;
 
-int pinDHT22 = 5;               // pin 5
-SimpleDHT22 dht22(pinDHT22);
-
-uint8_t measurementCount = 0;
-float temp_temperature = 0;
-float temp_humidity = 0;
-
-
 char str[50], ssid[30], key[30];
 int state = 0;
 int matches = 0;
 
+dht22_lib sensor_array[] = {
+    dht22_lib(5),
+    dht22_lib(13),
+    dht22_lib(14),
+    dht22_lib(15),
+    dht22_lib(27)
+};
 
-void IRAM_ATTR onTimer() {
+void IRAM_ATTR onTimer()
+{
   portENTER_CRITICAL_ISR(&timerMux);
   isrCounter++;
   lastIsrAt = millis();
@@ -48,11 +43,13 @@ void IRAM_ATTR onTimer() {
   xSemaphoreGiveFromISR(timerSemaphore, NULL);
 }
 
-void setup() {
+void setup()
+{
   WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
   delay(1000);
   Serial.begin(115200);
-  if (!EEPROM.begin(64)) {
+  if (!EEPROM.begin(64))
+  {
     Serial.println("Failed to initialise EEPROM");
     Serial.println("Restarting...");
     delay(1000);
@@ -82,8 +79,9 @@ void setup() {
   timerAlarmEnable(timer);
 }
 
-void loop() {
-  switch ( state )
+void loop()
+{
+  switch (state)
   {
     case 0:
       TemperatureMeasurement();
@@ -102,93 +100,28 @@ void loop() {
 
 void TemperatureMeasurement()
 {
-
-
-  float temperature = 0;
-  float humidity = 0;
-  int err = SimpleDHTErrSuccess;
-  if ((err = dht22.read2(&temperature, &humidity, NULL)) != SimpleDHTErrSuccess) {
-    Serial.print("Read DHT22 failed, err=");
-    Serial.println(err);
-  } else {
-    if (minTemp > temperature) {
-      minTemp = temperature;
-    }
-    if (minHum > humidity) {
-      minHum = humidity;
-    }
-    if (maxTemp < temperature) {
-      maxTemp = temperature;
-    }
-    if (maxHum < humidity) {
-      maxHum = humidity;
-    }
-    if (measurementCount == 0)
-    {
-      temp_temperature = (float)temperature;
-      temp_humidity = (float)humidity;
-    } else {
-      Serial.print("temp: " + (String)((float)temp_temperature));
-      Serial.println("humid " + (String)((float)temp_humidity));
-      if (measurementCount > 1) {
-        temp_temperature = (((float)(measurementCount - 1) * temp_temperature) + (float)temperature) / measurementCount;
-        temp_humidity = (((float)(measurementCount - 1) * temp_humidity) + (float)humidity) / measurementCount;
-      } else {
-        if (measurementCount == 0)
-        {
-          temp_temperature = (float)temperature;
-          temp_temperature = (float)humidity;
-        }
-      }
-    }
-    measurementCount++;
+  for (int i = 0; i < sizeof(sensor_array)/sizeof(sensor_array[0]); i++)
+  {
+    sensor_array[i].MeasureTemp();
   }
-  if (xSemaphoreTake(timerSemaphore, 0) == pdTRUE) {
+  if (xSemaphoreTake(timerSemaphore, 0) == pdTRUE)
+  {
     uint32_t isrCount = 0, isrTime = 0;
     portENTER_CRITICAL(&timerMux);
     isrCount = isrCounter;
     isrTime = lastIsrAt;
     portEXIT_CRITICAL(&timerMux);
-    if ((wifi.run() == WL_CONNECTED)) {
-      HTTPClient http;
-      http.begin(serverAddress); //HTTP
-      http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-      int httpCode = http.POST(
-                       "AVG_Humidity=" + (String)temp_humidity + "&" +
-                       "Max_Humidity=" + (String)maxHum + "&" +
-                       "Min_Humidity=" + (String)minHum + "&" +
-                       "AVG_Temperature=" + (String)temp_temperature + "&" +
-                       "Max_Temperature=" + (String)maxTemp + "&" +
-                       "Min_Temperature=" + (String)minTemp + "&" +
-                       "MAC=" + WiFi.macAddress() + "&" +
-                       "Password=" + "ESPtrzecie"
-                     );
-      if (httpCode > 0) {
-        Serial.printf("[HTTP] GET... code: %d\n", httpCode);
-        if (httpCode == HTTP_CODE_OK) {
-          String payload = http.getString();
-          Serial.println(payload);
-        }
-      } else {
-        Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+    if ((wifi.run() == WL_CONNECTED))
+    {
+      for (int i = 0; i < sizeof(sensor_array)/sizeof(sensor_array[0]); i++)
+      {
+        ReadingDatagram datagram = sensor_array[i].CurrentDatagram();
+        PushDataToServer(datagram);
+        sensor_array[i].ResetTemperature();
       }
-      http.end();
-      Serial.print("Status code: ");
-      Serial.println(httpCode);
-      Serial.print("Response: ");
-      Serial.println(response);
-      temp_humidity = 0;
-      temp_temperature = 0;
-      measurementCount = 0;
-
-      maxTemp = -50;
-      minTemp = 100;
-      minHum = 100;
-      maxHum = 0;
-
-
-
-    } else {
+    }
+    else
+    {
       Serial.println("Wifi not connected, restarting...");
       ESP.restart();
     }
@@ -197,11 +130,14 @@ void TemperatureMeasurement()
 
 bool PrepareConfig()
 {
-  for (byte i = 0; Serial.available(); i++) {
+  for (byte i = 0; Serial.available(); i++)
+  {
     str[i] = Serial.read();
   }
-  matches = sscanf (str, "@WIFI %s %s", &ssid, &key);
-  Serial.print("Matched "); Serial.print(matches); Serial.println(" credentials");
+  matches = sscanf(str, "@WIFI %s %s", &ssid, &key);
+  Serial.print("Matched ");
+  Serial.print(matches);
+  Serial.println(" credentials");
   if (matches == 1)
   {
     Serial.print("Wifi SSID is: ");
@@ -261,6 +197,43 @@ void WaitForSaveConfirmation()
     state = 0;
   }
   delay(5000);
+}
+
+bool PushDataToServer(ReadingDatagram data)
+{
+  HTTPClient http;
+  http.begin(serverAddress); //HTTP
+  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+  int httpCode = http.POST(
+                   "AVG_Humidity=" + (String)data.AVG_Humidity + "&" +
+                   "Max_Humidity=" + (String)data.Max_Humidity + "&" +
+                   "Min_Humidity=" + (String)data.Min_Humidity + "&" +
+                   "AVG_Temperature=" + (String)data.AVG_Temperature + "&" +
+                   "Max_Temperature=" + (String)data.Max_Temperature + "&" +
+                   "Min_Temperature=" + (String)data.Min_Temperature + "&" +
+                   "MAC=" + WiFi.macAddress() + "&" +
+                   "Password=" + "ESPtrzecie" + "&" +
+                   "API_VER=" + "1.1" + "&" +
+                   "Sensor_PIN=" + (String)data.PIN);
+  if (httpCode > 0)
+  {
+    Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+    if (httpCode == HTTP_CODE_OK)
+    {
+      String payload = http.getString();
+      Serial.println(payload);
+    }
+  }
+  else
+  {
+    Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+  }
+  http.end();
+  Serial.print("Status code: ");
+  Serial.println(httpCode);
+  Serial.print("Response: ");
+  Serial.println(response);
+
 }
 
 void CommitChanges()
