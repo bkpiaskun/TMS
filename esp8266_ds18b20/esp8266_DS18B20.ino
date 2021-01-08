@@ -107,7 +107,7 @@ bool PushDataToServer(ReadingDatagram data)
                    "Min_Temperature=" + (String)data.Min_Temperature + "&" +
                    "MAC=" + WiFi.macAddress() + "&" +
                    "Password=" + "ESPtrzecie" + "&" +
-                   "API_VER=" + "1.1" + "&" +
+                   "ApiVersion=" + "1.1" + "&" +
                    "Sensor_PIN=" + (String)data.PIN);
   if (httpCode > 0) {
     Serial.printf("[HTTP] GET... code: %d\n", httpCode);

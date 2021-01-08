@@ -112,7 +112,7 @@ bool PushDataToServer(ReadingDatagram data)
                    "Min_Humidity=" + (String)data.Min_Humidity + "&" +
                    "MAC=" + WiFi.macAddress() + "&" +
                    "Password=" + "ESPtrzecie" + "&" +
-                   "API_VER=" + "1.1" + "&" +
+                   "ApiVersion=" + "1.1" + "&" +
                    "Sensor_PIN=" + (String)data.PIN);
   if (httpCode > 0) {
     Serial.printf("[HTTP] GET... code: %d\n", httpCode);
