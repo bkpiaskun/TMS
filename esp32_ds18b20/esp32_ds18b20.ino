@@ -18,11 +18,11 @@ volatile uint32_t isrCounter = 0;
 volatile uint32_t lastIsrAt = 0;
 
 DS18B20_lib sensor_array[] = {
-    DS18B20_lib(5),
-    DS18B20_lib(14),
-    DS18B20_lib(13),
-    DS18B20_lib(15),
-    DS18B20_lib(27),
+  DS18B20_lib(5),
+  DS18B20_lib(14),
+  DS18B20_lib(13),
+  DS18B20_lib(15),
+  DS18B20_lib(27),
 };
 
 WiFiMulti wifi;
@@ -83,15 +83,15 @@ void loop()
 {
   switch (state)
   {
-  case 0:
-    TemperatureMeasurement();
-    break;
-  case 1:
-    PrepareConfig();
-    break;
-  case 2:
-    WaitForSaveConfirmation();
-    break;
+    case 0:
+      TemperatureMeasurement();
+      break;
+    case 1:
+      PrepareConfig();
+      break;
+    case 2:
+      WaitForSaveConfirmation();
+      break;
   }
   if (Serial.available() && state == 0)
     state = 1;
@@ -102,7 +102,7 @@ void loop()
 
 void TemperatureMeasurement()
 {
-  for (int i = 0; i < sizeof(sensor_array)/sizeof(sensor_array[0]); i++)
+  for (int i = 0; i < sizeof(sensor_array) / sizeof(sensor_array[0]); i++)
   {
     sensor_array[i].MeasureTemp();
   }
@@ -115,7 +115,7 @@ void TemperatureMeasurement()
     portEXIT_CRITICAL(&timerMux);
     if ((wifi.run() == WL_CONNECTED))
     {
-      for (int i = 0; i < sizeof(sensor_array)/sizeof(sensor_array[0]); i++)
+      for (int i = 0; i < sizeof(sensor_array) / sizeof(sensor_array[0]); i++)
       {
         ReadingDatagram datagram = sensor_array[i].CurrentDatagram();
         PushDataToServer(datagram);
@@ -234,13 +234,13 @@ bool PushDataToServer(ReadingDatagram data)
   http.begin(serverAddress); //HTTP
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");
   int httpCode = http.POST(
-      "AVG_Temperature=" + (String)data.AVG_Temperature + "&" +
-      "Max_Temperature=" + (String)data.Max_Temperature + "&" +
-      "Min_Temperature=" + (String)data.Min_Temperature + "&" +
-      "MAC=" + WiFi.macAddress() + "&" +
-      "Password=" + "ESPtrzecie" + "&" +
-      "ApiVersion=" + "1.1" + "&" +
-      "Sensor_PIN=" + (String)data.PIN);
+                   "AVG_Temperature=" + (String)data.AVG_Temperature + "&" +
+                   "Max_Temperature=" + (String)data.Max_Temperature + "&" +
+                   "Min_Temperature=" + (String)data.Min_Temperature + "&" +
+                   "MAC=" + WiFi.macAddress() + "&" +
+                   "Password=" + "ESPtrzecie" + "&" +
+                   "ApiVersion=" + "1.1" + "&" +
+                   "Sensor_PIN=" + (String)data.PIN);
   if (httpCode > 0)
   {
     Serial.printf("[HTTP] GET... code: %d\n", httpCode);

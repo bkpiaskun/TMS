@@ -17,11 +17,11 @@ String serverAddress = "http://TMS.Server.org/";
 int port = 80;
 
 dht22_lib sensor_array[] = {
-    dht22_lib(D1),
-    dht22_lib(D2),
-    dht22_lib(D3),
-    dht22_lib(D6),
-    dht22_lib(D5)
+  dht22_lib(D1),
+  dht22_lib(D2),
+  dht22_lib(D3),
+  dht22_lib(D6),
+  dht22_lib(D5)
 };
 
 char str[50], ssid[30], key[30];

@@ -98,7 +98,7 @@ void TemperatureMeasurement()
 
 bool PushDataToServer(ReadingDatagram data)
 {
-  
+
   HTTPClient http;
   http.begin(serverAddress); //HTTP
   Serial.println(serverAddress);
