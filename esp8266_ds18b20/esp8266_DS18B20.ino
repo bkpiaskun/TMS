@@ -2,10 +2,12 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
 #include <ESP8266HTTPClient.h>
-#include <OneWire.h>
-#include <DallasTemperature.h>
 #include "EEPROM.h"
 #include <Ticker.h>
+
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
 #include "DS18B20_lib.h"
 
 Ticker blinker;

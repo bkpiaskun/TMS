@@ -4,9 +4,11 @@
 #include <HTTPClient.h>
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
+#include "EEPROM.h"
+
 #include <OneWire.h>
 #include <DallasTemperature.h>
-#include "EEPROM.h"
+
 #include "DS18B20_lib.h"
 
 hw_timer_t *timer = NULL;
