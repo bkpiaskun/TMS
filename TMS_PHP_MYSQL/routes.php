@@ -228,8 +228,10 @@ if ($action == 'validate') {
 if ($action == 'showSensors') {
 	$sql = "SELECT Sensor_ID,Sensor_Name
 	FROM Sensors ss
+	JOIN Devices dv
+	on dv.Device_ID = ss.Device_ID
 	JOIN Users us
-	ON ss.User_ID = us.User_ID
+	ON dv.User_ID = us.User_ID
 	WHERE us.UserName = '" . $UserName . "'
 	AND us.API_KEY = '" . $ApiKey . "'";
 	$result = $conn->query($sql);
@@ -294,8 +296,10 @@ if ($action == 'showAveragedData') {
         FROM Sensor_Readings sr
         JOIN Sensors snrs
         ON sr.Sensor_ID = snrs.Sensor_ID
+		JOIN Devices dv
+		ON dv.Device_ID = snrs.Device_ID
         JOIN Users usr
-        ON usr.User_ID = snrs.User_ID
+        ON usr.User_ID = dv.User_ID
         WHERE
                 sr.Timestamp_Of_Reading >= '" . $startDate . "' AND
                 sr.Timestamp_Of_Reading <= '" . $endDate . "' AND
