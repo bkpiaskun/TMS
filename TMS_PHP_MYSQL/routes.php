@@ -1,93 +1,105 @@
 <?php
 
+$action = $_GET['action'];
+
+$ApiVersion_G = $_GET['ApiVersion'];
+$ApiVersion_P = $_POST['ApiVersion'];
+
+$AVG_Humidity = $_POST['AVG_Humidity'];
+$Max_Humidity = $_POST['Max_Humidity'];
+$Min_Humidity = $_POST['Min_Humidity'];
+$AVG_Temperature = $_POST['AVG_Temperature'];
+$Max_Temperature = $_POST['Max_Temperature'];
+$Min_Temperature = $_POST['Min_Temperature'];
+$Sensor_PIN = $_POST['Sensor_PIN'];
+$pass = $_POST['Password'];
+$mac = $_POST['MAC'];
+
+$UserName = $_GET['UserName'];
+$ApiKey = $_GET['ApiKey'];
+$startDate = $_GET['StartDate'];
+$endDate = $_GET['EndDate'];
+$Sensor_ID = $_GET['Sensor_ID'];
+
+if($ApiVersion_P != null)
+{
+    echo "ApiVersion: " . $ApiVersion_P . "\r\n"; 
+}
+
+if($Sensor_PIN != null)
+{
+    echo "Sensor_PIN: " . $Sensor_PIN . "\r\n";
+}
+
+
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
 	die('[{"status": "Error"}]');
 }
 
-$sensor_ID = 0;
-$result = $conn->query("SELECT Sensor_Id,Sensor_Name,Mac_Address,Password FROM Sensors");
-if ($result->num_rows > 0) {
-	while ($row = $result->fetch_assoc()) {
-		if ($row["Mac_Address"] == $mac && $row["Password"] == $pass) {
-			$sensor_ID = $row["Sensor_Id"];
-			break;
+if($action == null){
+	$Sensor_ID = -1;
+	
+	if($ApiVersion_P == null)
+	{
+		if(!$stmt = $conn->prepare("SELECT Sensor_ID FROM Devices dv Join Sensors sen on dv.Device_ID = sen.Device_ID where Mac_Address = ? and Password = ?"))
+		{
+			die('[{"status": "Error"}]');
+		}
+		$stmt->bind_param("ss", $mac, $pass);
+	} else {
+		if(!$stmt = $conn->prepare("SELECT Sensor_ID FROM Devices dv Join Sensors sen on dv.Device_ID = sen.Device_ID where Mac_Address = ? and Password = ? and PIN = ?"))
+		{
+			die('[{"status": "Error"}]');
+		}
+		$stmt->bind_param("sss", $mac, $pass, $Sensor_PIN);
+	}
+	$stmt->execute();
+	$result = $stmt->get_result();
+	if ($result->num_rows > 0) {
+		while ($row = $result->fetch_assoc()) {
+			$Sensor_ID = $row["Sensor_ID"];
 		}
 	}
-} else {
-	echo "<p>żadnych sensorów nie ma<p>";
-}
-
-if($_GET['action'] == null){
-	if ($sensor_ID != 0) {
-
+	if($Sensor_ID != -1)
+	{
 		if ($AVG_Humidity == null) {
 			$AVG_Humidity = -1;
-		}
-		if ($Max_Humidity == null) {
 			$Max_Humidity = -1;
-		}
-		if ($Min_Humidity == null) {
 			$Min_Humidity = -1;
 		}
 
-		$sql = "INSERT INTO Sensor_Readings (
-		Sensor_ID,
-		AVG_Humidity,
-		Max_Humidity,
-		Min_Humidity,
-		AVG_Temperature,
-		Max_Temperature,
-		Min_Temperature
-		)
-		VALUES (
-		$sensor_ID,
-		$AVG_Humidity,
-		$Max_Humidity,
-		$Min_Humidity,
-		$AVG_Temperature,
-		$Max_Temperature,
-		$Min_Temperature
-		)";
-		if ($conn->query($sql) === TRUE) {
-			echo "New record created successfully";
+		$stmt = $conn->prepare("INSERT INTO Sensor_Readings 
+		( Sensor_ID, AVG_Humidity, Max_Humidity, Min_Humidity, AVG_Temperature, Max_Temperature, Min_Temperature )
+		VALUES 
+		( ?,?,?,?,?,?,? )");
+		if(!$stmt)
+			die('[{"status": "Error"}]');
+
+		$stmt->bind_param("idddddd", $Sensor_ID, $AVG_Humidity, $Max_Humidity, $Min_Humidity, $AVG_Temperature, $Max_Temperature, $Min_Temperature);
+		if ($stmt->execute()) {
+			echo "<p>New record created successfully</p>";
 		} else {
-			echo "Error: " . $sql . "<br>" . $conn->error;
+			echo "<p>Error: " . $sql . "<br>" . $conn->error . "</p>";
 		}
 	} else {
-		if ($mac != null && $pass != null) {
-			$sql = "INSERT INTO Sensor_Log (
-				Sensor_ID,
-				AVG_Humidity,
-				Max_Humidity,
-				Min_Humidity,
-				AVG_Temperature,
-				Max_Temperature,
-				Min_Temperature,
-				Mac_Address,
-				Password
-				)
-				VALUES (
-				$sensor_ID,
-				$AVG_Humidity,
-				$Max_Humidity,
-				$Min_Humidity,
-				$AVG_Temperature,
-				$Max_Temperature,
-				$Min_Temperature,
-				$mac,
-				$pass
-			)";
-			if ($conn->query($sql) === TRUE) {
-				echo "New record created successfully";
-			} else {
-				echo "Error: " . $sql . "<br>" . $conn->error;
-			}
+		$stmt = $conn->prepare("INSERT INTO Sensor_Log
+			( Sensor_ID, AVG_Humidity, Max_Humidity, Min_Humidity, AVG_Temperature, Max_Temperature, Min_Temperature, Mac_Address, Password, PIN )
+			VALUES 
+			( ?,?,?,?,?,?,?,?,?,? )");
+		if(!$stmt)
+			die('[{"status": "Error"}]');
+
+		$stmt->bind_param("iddddddssi", $Sensor_ID, $AVG_Humidity, $Max_Humidity, $Min_Humidity, $AVG_Temperature, $Max_Temperature, $Min_Temperature, $mac, $pass, $Sensor_PIN);
+		if ($stmt->execute()) {
+			echo "<p>New record created successfully</p>";
+		} else {
+			echo "<p>Error: " . $sql . "<br>" . $conn->error . "</p>";
 		}
 	}
 }
-
-if ($_GET['action'] == 'LAST') {
+if ($action == 'LAST') {
 	$result = $conn->query("Select * from Measurements_With_Differences");
 	$resultArray = array();
 	if ($result->num_rows > 0) {
@@ -97,8 +109,7 @@ if ($_GET['action'] == 'LAST') {
 	}
 	echo json_encode($resultArray);
 }
-
-if ($_GET['action'] == 'MyLasts') {
+if ($action == 'MyLasts') {
 	$sql = "SELECT *
 			FROM (
 			SELECT `temptable1`.`ID` AS `ID`,
@@ -127,7 +138,7 @@ if ($_GET['action'] == 'MyLasts') {
 						) `temptable1`
 			WHERE ((MINUTE(`temptable1`.`diffTime`) < 5) AND (HOUR(`temptable1`.`diffTime`) = 0))
 			ORDER BY `temptable1`.`diffTime`) ttj;";
-	switch ($_GET['ApiVersion']) {
+	switch ($ApiVersion_G) {
 		case '1.1':
 			$sql = "SELECT *
 			FROM (
@@ -200,9 +211,7 @@ if ($_GET['action'] == 'MyLasts') {
 	}
 	echo json_encode($resultArray);
 }
-if ($_GET['action'] == 'validate') {
-	$UserName = $_GET['UserName'];
-	$ApiKey = $_GET['ApiKey'];
+if ($action == 'validate') {
 	$UserValidation = "Failure";
 	$sql = "Select UserName,API_KEY from Users";
 	$result = $conn->query($sql);
@@ -216,10 +225,8 @@ if ($_GET['action'] == 'validate') {
 	}
 	echo json_encode($UserValidation);
 }
-if ($_GET['action'] == 'showSensors') {
-	$UserName = $_GET['UserName'];
-	$ApiKey = $_GET['ApiKey'];
-	$sql = "SELECT Sensor_Id,Sensor_Name
+if ($action == 'showSensors') {
+	$sql = "SELECT Sensor_ID,Sensor_Name
 	FROM Sensors ss
 	JOIN Users us
 	ON ss.User_ID = us.User_ID
@@ -234,10 +241,7 @@ if ($_GET['action'] == 'showSensors') {
 	}
 	echo json_encode($resultArray);
 }
-if ($_GET['action'] == 'showSensorAveraged') {
-	$startDate = $_GET['StartDate'];
-	$endDate = $_GET['EndDate'];
-	$sensor_ID = $_GET['Sensor_ID'];
+if ($action == 'showSensorAveraged') {
 
 	$sql = "SELECT 
 	  ttj.dateDay,
@@ -256,7 +260,7 @@ if ($_GET['action'] == 'showSensorAveraged') {
 		WHERE 
 			sr.Timestamp_Of_Reading >= '" . $startDate . "' AND
 			sr.Timestamp_Of_Reading <= '" . $endDate . "' and
-			sr.Sensor_ID = '" . $sensor_ID . "'
+			sr.Sensor_ID = '" . $Sensor_ID . "'
 		) xd
 	group by date(Timestamp_Of_Reading),(hour(Timestamp_Of_Reading))
 	ORDER BY dateDay ASC,dateHour ASC
@@ -270,11 +274,7 @@ if ($_GET['action'] == 'showSensorAveraged') {
 	}
 	echo json_encode($resultArray);
 }
-if ($_GET['action'] == 'showAveragedData') {
-	$startDate = $_GET['StartDate'];
-	$endDate = $_GET['EndDate'];
-	$UserName = $_GET['UserName'];
-	$ApiKey = $_GET['ApiKey'];
+if ($action == 'showAveragedData') {
 
 	$sql = "SELECT
           ttj.dateDay,
@@ -314,11 +314,8 @@ if ($_GET['action'] == 'showAveragedData') {
 	}
 	echo json_encode($resultArray);
 }
-
-if ($_GET['action'] == 'status') {
+if ($action == 'status') {
 	echo '[{"status": "Working"}]';
 }
 
 $conn->close();
-
-?>
