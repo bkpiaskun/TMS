@@ -1,5 +1,5 @@
-#include "dht22_lib.h"
 #include <SimpleDHT.h>
+#include "dht22_lib.h"
 
 dht22_lib::dht22_lib(int pin)
 {

@@ -5,9 +5,6 @@
 #include "EEPROM.h"
 #include <Ticker.h>
 
-#include <OneWire.h>
-#include <DallasTemperature.h>
-
 #include "dht22_lib.h"
 
 
