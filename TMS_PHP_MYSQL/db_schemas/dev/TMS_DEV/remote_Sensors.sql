@@ -13,15 +13,14 @@
 
 -- Zrzut struktury tabela TMS_DEV.remote_Sensors
 CREATE TABLE IF NOT EXISTS `remote_Sensors` (
-  `Sensor_Id` int(11) NOT NULL AUTO_INCREMENT,
-  `User_ID` int(11) NOT NULL DEFAULT '0',
+  `Sensor_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Device_ID` int(11) NOT NULL DEFAULT '0',
   `Sensor_Name` varchar(30) NOT NULL,
-  `Mac_Address` varchar(30) NOT NULL,
-  `Password` varchar(30) NOT NULL,
-  PRIMARY KEY (`Sensor_Id`),
-  UNIQUE KEY `Mac_Address` (`Mac_Address`),
-  KEY `User_ID` (`User_ID`)
+  `PIN` int(11) DEFAULT NULL,
+  PRIMARY KEY (`Sensor_ID`) USING BTREE,
+  KEY `Device_ID` (`Device_ID`) USING BTREE
 ) ENGINE=FEDERATED DEFAULT CHARSET=utf8 CONNECTION='linked/Sensors';
+
 
 -- Eksport danych został odznaczony.
 

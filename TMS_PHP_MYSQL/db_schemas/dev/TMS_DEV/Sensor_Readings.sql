@@ -23,8 +23,9 @@ CREATE TABLE IF NOT EXISTS `Sensor_Readings` (
   `Max_Temperature` float DEFAULT NULL,
   `Min_Temperature` float DEFAULT NULL,
   PRIMARY KEY (`ID`),
-  KEY `Sensor_ID` (`Sensor_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=4512328 DEFAULT CHARSET=utf8;
+  KEY `Sensor_ID` (`Sensor_ID`),
+  KEY `Timestamp_Of_Reading` (`Timestamp_Of_Reading`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Eksport danych został odznaczony.
 

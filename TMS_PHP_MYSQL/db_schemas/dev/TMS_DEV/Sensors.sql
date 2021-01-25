@@ -13,15 +13,14 @@
 
 -- Zrzut struktury tabela TMS_DEV.Sensors
 CREATE TABLE IF NOT EXISTS `Sensors` (
-  `Sensor_Id` int(11) NOT NULL AUTO_INCREMENT,
-  `User_ID` int(11) NOT NULL DEFAULT '0',
+  `Sensor_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Device_ID` int(11) NOT NULL DEFAULT '0',
   `Sensor_Name` varchar(30) NOT NULL,
-  `Mac_Address` varchar(30) NOT NULL,
-  `Password` varchar(30) NOT NULL,
-  PRIMARY KEY (`Sensor_Id`),
-  UNIQUE KEY `Mac_Address` (`Mac_Address`),
-  KEY `User_ID` (`User_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
+  `PIN` int(11) DEFAULT NULL,
+  PRIMARY KEY (`Sensor_ID`) USING BTREE,
+  KEY `Device_ID` (`Device_ID`),
+  CONSTRAINT `FK_Sensors_Devices` FOREIGN KEY (`Device_ID`) REFERENCES `Devices` (`Device_ID`) ON UPDATE RESTRICT ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Eksport danych został odznaczony.
 

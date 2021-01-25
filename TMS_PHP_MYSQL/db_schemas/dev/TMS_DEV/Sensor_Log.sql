@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS `Sensor_Log` (
   `Min_Temperature` float DEFAULT NULL,
   `Mac_Address` varchar(30) NOT NULL,
   `Password` varchar(30) NOT NULL,
+  `PIN` int(11) DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `Sensor_ID` (`Sensor_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
