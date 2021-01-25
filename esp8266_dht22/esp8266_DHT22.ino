@@ -2,10 +2,9 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
 #include <ESP8266HTTPClient.h>
-#include <OneWire.h>
-#include <DallasTemperature.h>
 #include "EEPROM.h"
 #include <Ticker.h>
+
 #include "dht22_lib.h"
 
 
@@ -15,11 +14,11 @@ String serverAddress = "http://TMS.Server.org/";
 int port = 80;
 
 dht22_lib sensor_array[] = {
-    dht22_lib(D1),
-    dht22_lib(D2),
-    dht22_lib(D3),
-    dht22_lib(D6),
-    dht22_lib(D5)
+  dht22_lib(D1),
+  dht22_lib(D2),
+  dht22_lib(D3),
+  dht22_lib(D6),
+  dht22_lib(D5)
 };
 
 char str[50], ssid[30], key[30];

@@ -49,7 +49,7 @@ void DS18B20_lib::MeasureTemp()
   {
     Serial.print("Read DS18B20 failed on pin:");
     Serial.println(pinDS18B20);
-    Serial.println("TEMP: "+(String)temperature);
+    Serial.println("TEMP: " + (String)temperature);
   }
 }
 

@@ -15,17 +15,28 @@
 DELIMITER //
 CREATE PROCEDURE `Synchronize_Sensors`()
 BEGIN
-	REPLACE INTO TMS_DEV.Sensors
+	SET @Last_ID = ifnull((SELECT MAX(Sensor_ID) FROM TMS_DEV.Sensors),0);
+
+	DELETE Sensors 
+	FROM TMS_DEV.Sensors 
+	LEFT JOIN TMS_DEV.remote_Sensors rsr
+	ON sr.Sensor_ID = rsr.Sensor_ID
+	WHERE sr.Sensor_ID IS NOT NULL
+	AND (	sr.Sensor_Name != rsr.Sensor_Name
+	or sr.PIN != rsr.PIN
+	OR sr.Device_ID != rsr.Device_ID )
+	and rsr.Sensor_ID >= @Last_ID
+	AND rsr.Sensor_ID < @Last_ID + 10000;
+
+	
+	INSERT INTO TMS_DEV.Sensors
 	SELECT rsr.*
 	FROM  TMS_DEV.remote_Sensors rsr
 	LEFT JOIN TMS_DEV.Sensors sr
 	ON sr.Sensor_ID = rsr.Sensor_ID
 	WHERE sr.Sensor_ID IS NULL
-	or (sr.User_ID != rsr.User_ID
-	or sr.Sensor_Name != rsr.Sensor_Name
-	or sr.Mac_Address != rsr.Mac_Address
-	or sr.Password != rsr.Password);
-
+	and rsr.Sensor_ID >= @Last_ID
+	AND rsr.Sensor_ID < @Last_ID + 10000;
 
 	IF FOUND_ROWS() > 0 THEN
 	INSERT INTO TMS_DEV.MultiLog (VALUE,Source)

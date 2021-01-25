@@ -2,10 +2,12 @@
 #include <WiFi.h>
 #include <WiFiMulti.h>
 #include <HTTPClient.h>
-#include <SimpleDHT.h>
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
 #include "EEPROM.h"
+
+#include <SimpleDHT.h>
+
 #include "dht22_lib.h"
 
 hw_timer_t *timer = NULL;
@@ -27,11 +29,11 @@ int state = 0;
 int matches = 0;
 
 dht22_lib sensor_array[] = {
-    dht22_lib(5),
-    dht22_lib(13),
-    dht22_lib(14),
-    dht22_lib(15),
-    dht22_lib(27)
+  dht22_lib(5),
+  dht22_lib(13),
+  dht22_lib(14),
+  dht22_lib(15),
+  dht22_lib(27)
 };
 
 void IRAM_ATTR onTimer()
@@ -100,7 +102,7 @@ void loop()
 
 void TemperatureMeasurement()
 {
-  for (int i = 0; i < sizeof(sensor_array)/sizeof(sensor_array[0]); i++)
+  for (int i = 0; i < sizeof(sensor_array) / sizeof(sensor_array[0]); i++)
   {
     sensor_array[i].MeasureTemp();
   }
@@ -113,7 +115,7 @@ void TemperatureMeasurement()
     portEXIT_CRITICAL(&timerMux);
     if ((wifi.run() == WL_CONNECTED))
     {
-      for (int i = 0; i < sizeof(sensor_array)/sizeof(sensor_array[0]); i++)
+      for (int i = 0; i < sizeof(sensor_array) / sizeof(sensor_array[0]); i++)
       {
         ReadingDatagram datagram = sensor_array[i].CurrentDatagram();
         PushDataToServer(datagram);

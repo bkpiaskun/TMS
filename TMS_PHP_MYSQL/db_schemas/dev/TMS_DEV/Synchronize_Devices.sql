@@ -12,23 +12,41 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Zrzut struktury tabela TMS.Sensor_Readings
-CREATE TABLE IF NOT EXISTS `Sensor_Readings` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `Sensor_ID` int(11) NOT NULL,
-  `Timestamp_Of_Reading` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `AVG_Humidity` float DEFAULT NULL,
-  `Max_Humidity` float DEFAULT NULL,
-  `Min_Humidity` float DEFAULT NULL,
-  `AVG_Temperature` float DEFAULT NULL,
-  `Max_Temperature` float DEFAULT NULL,
-  `Min_Temperature` float DEFAULT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `Sensor_ID` (`Sensor_ID`),
-  KEY `Timestamp_Of_Reading` (`Timestamp_Of_Reading`)
-) ENGINE=InnoDB AUTO_INCREMENT=5608 DEFAULT CHARSET=utf8;
+-- Zrzut struktury procedura TMS_DEV.Synchronize_Devices
+DELIMITER //
+CREATE PROCEDURE `Synchronize_Devices`()
+BEGIN
 
--- Eksport danych został odznaczony.
+	SET @Last_ID = ifnull((SELECT MAX(Sensor_ID) FROM TMS_DEV.Sensors),0);
+	
+	DELETE sr.*
+	FROM TMS_DEV.Sensors sr
+	LEFT JOIN TMS_DEV.remote_Sensors rsr
+	ON sr.Sensor_ID = rsr.Sensor_ID
+	WHERE sr.Sensor_ID IS NOT NULL
+	AND (	sr.Sensor_Name != rsr.Sensor_Name
+	or sr.PIN != rsr.PIN
+	OR sr.Device_ID != rsr.Device_ID )
+	and rsr.Sensor_ID >= @Last_ID
+	AND rsr.Sensor_ID < @Last_ID + 10000;
+
+
+	INSERT INTO TMS_DEV.Sensors
+	SELECT rsr.*
+	FROM  TMS_DEV.remote_Sensors rsr
+	LEFT JOIN TMS_DEV.Sensors sr
+	ON sr.Sensor_ID = rsr.Sensor_ID
+	WHERE sr.Sensor_ID IS NULL
+	and rsr.Sensor_ID >= @Last_ID
+	AND rsr.Sensor_ID < @Last_ID + 10000;
+
+	IF FOUND_ROWS() > 0 THEN
+	INSERT INTO TMS_DEV.MultiLog (VALUE,Source)
+	SELECT CONCAT(FOUND_ROWS(),' rekordów zsynchronizowane'),'SynchroSNRS';
+	END IF;
+
+END//
+DELIMITER ;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
