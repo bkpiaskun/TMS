@@ -1,17 +1,9 @@
-#include <SimpleDHT.h>
+#include "SimpleDHT.h"
 
-struct ReadingDatagram
-{
-  float AVG_Humidity;
-  float Max_Humidity;
-  float Min_Humidity;
-  float AVG_Temperature;
-  float Max_Temperature;
-  float Min_Temperature;
-  int PIN;
-};
+#include "SensorLib.h"
 
-class dht22_lib
+
+class DHT22_lib : public SensorLib
 {
   private:
     int measurementCount, pinDHT22;
@@ -19,7 +11,7 @@ class dht22_lib
     float maxTemp, minTemp, minHum, maxHum, temp_temperature, temp_humidity;
 
   public:
-    dht22_lib(int pin);
+    DHT22_lib(int pin);
     void MeasureTemp();
     void ResetTemperature();
     ReadingDatagram CurrentDatagram();

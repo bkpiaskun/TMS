@@ -8,6 +8,7 @@ DS18B20_lib::DS18B20_lib(int pin)
   this->oneWire = OneWire(pinDS18B20);
   this->DS18B20 = DallasTemperature(&oneWire);
   this->DS18B20.begin();
+  this->ResetTemperature();
 }
 
 void DS18B20_lib::MeasureTemp()
