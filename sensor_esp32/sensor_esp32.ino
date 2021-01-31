@@ -6,10 +6,11 @@
 #include "soc/rtc_cntl_reg.h"
 #include "EEPROM.h"
 
-#include <OneWire.h>
-#include <DallasTemperature.h>
+#include <SimpleDHT.h>
 
+#include "DHT22_lib.h"
 #include "DS18B20_lib.h"
+#include "SensorLib.h"
 
 hw_timer_t *timer = NULL;
 volatile SemaphoreHandle_t timerSemaphore;
@@ -17,22 +18,32 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 volatile uint32_t isrCounter = 0;
 volatile uint32_t lastIsrAt = 0;
 
-DS18B20_lib sensor_array[] = {
-  DS18B20_lib(5),
-  DS18B20_lib(14),
-  DS18B20_lib(13),
-  DS18B20_lib(15),
-  DS18B20_lib(27),
-};
-
-WiFiMulti wifi;
-
 String serverAddress = "http://TMS.Server.org/";
 int port = 80;
+
+WiFiMulti wifi;
+int status = WL_IDLE_STATUS;
+String response;
+int statusCode = 0;
 
 char str[50], ssid[30], key[30];
 int state = 0;
 int matches = 0;
+
+SensorLib *sensor_array[] =
+{
+  new DS18B20_lib(5),
+  new DS18B20_lib(13),
+  new DS18B20_lib(14),
+  new DS18B20_lib(15),
+  new DS18B20_lib(27),
+//  new DHT22_lib(5),
+//  new DHT22_lib(13),
+//  new DHT22_lib(14),
+//  new DHT22_lib(15),
+//  new DHT22_lib(27),
+};
+
 
 void IRAM_ATTR onTimer()
 {
@@ -48,6 +59,7 @@ void setup()
   WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
   delay(1000);
   Serial.begin(115200);
+  Serial.println("Start ESP32");
   if (!EEPROM.begin(64))
   {
     Serial.println("Failed to initialise EEPROM");
@@ -95,16 +107,14 @@ void loop()
   }
   if (Serial.available() && state == 0)
     state = 1;
-
-  delay(100);
-  //################## CALCS
+  delay(1000);
 }
 
 void TemperatureMeasurement()
 {
   for (int i = 0; i < sizeof(sensor_array) / sizeof(sensor_array[0]); i++)
   {
-    sensor_array[i].MeasureTemp();
+    sensor_array[i]->MeasureTemp();
   }
   if (xSemaphoreTake(timerSemaphore, 0) == pdTRUE)
   {
@@ -117,15 +127,14 @@ void TemperatureMeasurement()
     {
       for (int i = 0; i < sizeof(sensor_array) / sizeof(sensor_array[0]); i++)
       {
-        ReadingDatagram datagram = sensor_array[i].CurrentDatagram();
+        ReadingDatagram datagram = sensor_array[i]->CurrentDatagram();
         PushDataToServer(datagram);
-        sensor_array[i].ResetTemperature();
+        sensor_array[i]->ResetTemperature();
       }
     }
     else
     {
-      Serial.println("WIFI NOT CONNECTED, REBOOT");
-      delay(300);
+      Serial.println("Wifi not connected, restarting...");
       ESP.restart();
     }
   }
@@ -202,38 +211,15 @@ void WaitForSaveConfirmation()
   delay(5000);
 }
 
-void CommitChanges()
-{
-  for (int x = 0; x < 64; x++)
-  {
-    EEPROM.write(x, 0);
-  }
-  EEPROM.writeString(0, ssid);
-  yield();
-  EEPROM.writeString(sizeof(ssid), key);
-  yield();
-  EEPROM.commit();
-  for (int i = 0; i < 20; i++)
-  {
-    ssid[i] = 0;
-    key[i] = 0;
-  }
-  for (int i = 0; i < 50; i++)
-  {
-    str[i] = 0;
-  }
-  Serial.println("Config Saved");
-}
-
 bool PushDataToServer(ReadingDatagram data)
 {
-  int status = WL_IDLE_STATUS;
-  String response;
-  int statusCode = 0;
   HTTPClient http;
   http.begin(serverAddress); //HTTP
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");
   int httpCode = http.POST(
+                   "AVG_Humidity=" + (String)data.AVG_Humidity + "&" +
+                   "Max_Humidity=" + (String)data.Max_Humidity + "&" +
+                   "Min_Humidity=" + (String)data.Min_Humidity + "&" +
                    "AVG_Temperature=" + (String)data.AVG_Temperature + "&" +
                    "Max_Temperature=" + (String)data.Max_Temperature + "&" +
                    "Min_Temperature=" + (String)data.Min_Temperature + "&" +
@@ -259,4 +245,15 @@ bool PushDataToServer(ReadingDatagram data)
   Serial.println(httpCode);
   Serial.print("Response: ");
   Serial.println(response);
+
+}
+
+void CommitChanges()
+{
+  EEPROM.writeString(0, ssid);
+  yield();
+  EEPROM.writeString(sizeof(ssid), key);
+  yield();
+  EEPROM.commit();
+  Serial.println("Config Saved");
 }

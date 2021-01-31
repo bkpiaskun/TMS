@@ -1,13 +1,14 @@
-#include "dht22_lib.h"
+#include "DHT22_lib.h"
 #include "SimpleDHT.h"
 
-dht22_lib::dht22_lib(int pin)
+DHT22_lib::DHT22_lib(int pin)
 {
   this->pinDHT22 = pin;
   this->dht22 = SimpleDHT22(pin);
+  this->ResetTemperature();
 }
 
-void dht22_lib::MeasureTemp()
+void DHT22_lib::MeasureTemp()
 {
   float temperature = 0;
   float humidity = 0;
@@ -64,7 +65,7 @@ void dht22_lib::MeasureTemp()
   }
 }
 
-void dht22_lib::ResetTemperature()
+void DHT22_lib::ResetTemperature()
 {
   measurementCount = 0;
   maxTemp = -50;
@@ -75,7 +76,7 @@ void dht22_lib::ResetTemperature()
   temp_humidity = minHum;
 }
 
-ReadingDatagram dht22_lib::CurrentDatagram()
+ReadingDatagram DHT22_lib::CurrentDatagram()
 {
   ReadingDatagram dtm;
   dtm.Max_Temperature = maxTemp;
