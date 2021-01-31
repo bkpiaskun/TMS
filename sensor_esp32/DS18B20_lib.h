@@ -1,15 +1,9 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-struct ReadingDatagram
-{
-  float AVG_Temperature;
-  float Max_Temperature;
-  float Min_Temperature;
-  int PIN;
-};
+#include "SensorLib.h"
 
-class DS18B20_lib
+class DS18B20_lib : public SensorLib
 {
   private:
     int measurementCount, pinDS18B20;

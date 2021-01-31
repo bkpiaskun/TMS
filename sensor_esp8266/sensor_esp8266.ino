@@ -5,20 +5,27 @@
 #include "EEPROM.h"
 #include <Ticker.h>
 
-#include "dht22_lib.h"
-
+#include "DHT22_lib.h"
+#include "DS18B20_lib.h"
+#include "SensorLib.h"
 
 Ticker blinker;
 
 String serverAddress = "http://TMS.Server.org/";
 int port = 80;
 
-dht22_lib sensor_array[] = {
-  dht22_lib(D1),
-  dht22_lib(D2),
-  dht22_lib(D3),
-  dht22_lib(D6),
-  dht22_lib(D5)
+SensorLib *sensor_array[] =
+{
+  new DS18B20_lib(D1),
+  new DS18B20_lib(D2),
+  new DS18B20_lib(D3),
+  new DS18B20_lib(D4),
+  new DS18B20_lib(D5),
+//  new DHT22_lib(D1),
+//  new DHT22_lib(D2),
+//  new DHT22_lib(D3),
+//  new DHT22_lib(D4),
+//  new DHT22_lib(D5),
 };
 
 char str[50], ssid[30], key[30];
@@ -38,7 +45,7 @@ void onTime() {
 void setup()
 {
   Serial.begin(74880);
-  Serial.println("ESP8266 START");
+  Serial.println("START ESP8266");
   blinker.attach(30, onTime);
   for (int i = 0; i < 20; i++)
   {
@@ -54,9 +61,8 @@ void setup()
   WiFiMulti.addAP(ssid, key);
 }
 
-void loop()
-{
-  switch (state)
+void loop() {
+  switch ( state )
   {
     case 0:
       TemperatureMeasurement();
@@ -70,23 +76,22 @@ void loop()
   }
   if (Serial.available() && state == 0)
     state = 1;
-  delay(1000);
 }
 
 void TemperatureMeasurement()
 {
   for (int i = 0; i < sizeof(sensor_array) / sizeof(sensor_array[0]); i++)
   {
-    sensor_array[i].MeasureTemp();
+    sensor_array[i]->MeasureTemp();
   }
   if (timeToPublish) {
     timeToPublish = false;
     if ((WiFiMulti.run() == WL_CONNECTED)) {
       for (int i = 0; i < sizeof(sensor_array) / sizeof(sensor_array[0]); i++)
       {
-        ReadingDatagram datagram = sensor_array[i].CurrentDatagram();
+        ReadingDatagram datagram = sensor_array[i]->CurrentDatagram();
         PushDataToServer(datagram);
-        sensor_array[i].ResetTemperature();
+        sensor_array[i]->ResetTemperature();
       }
     } else {
       Serial.println("WIFI NOT CONNECTED, REBOOT");
@@ -98,6 +103,7 @@ void TemperatureMeasurement()
 
 bool PushDataToServer(ReadingDatagram data)
 {
+
   HTTPClient http;
   http.begin(serverAddress); //HTTP
   Serial.println(serverAddress);
@@ -106,9 +112,6 @@ bool PushDataToServer(ReadingDatagram data)
                    "AVG_Temperature=" + (String)data.AVG_Temperature + "&" +
                    "Max_Temperature=" + (String)data.Max_Temperature + "&" +
                    "Min_Temperature=" + (String)data.Min_Temperature + "&" +
-                   "AVG_Humidity=" + (String)data.AVG_Humidity + "&" +
-                   "Max_Humidity=" + (String)data.Max_Humidity + "&" +
-                   "Min_Humidity=" + (String)data.Min_Humidity + "&" +
                    "MAC=" + WiFi.macAddress() + "&" +
                    "Password=" + "ESPtrzecie" + "&" +
                    "ApiVersion=" + "1.1" + "&" +
