@@ -12,12 +12,15 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Zrzut struktury tabela TMS.Devices
+-- Zrzut struktury tabela TMS_DEV.Devices
 CREATE TABLE IF NOT EXISTS `Devices` (
   `Device_ID` int(11) NOT NULL AUTO_INCREMENT,
   `User_ID` int(11) DEFAULT NULL,
   `Mac_Address` varchar(30) NOT NULL DEFAULT '',
   `Password` varchar(30) NOT NULL DEFAULT '',
+  `Current_FW` int(11) DEFAULT NULL,
+  `Device_Type` int(11) DEFAULT NULL,
+  `Updates_Disabled_Date` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`Device_ID`),
   KEY `User_ID` (`User_ID`),
   CONSTRAINT `FK_Devices_Users` FOREIGN KEY (`User_ID`) REFERENCES `Users` (`User_ID`)

@@ -1,10 +1,3 @@
--- --------------------------------------------------------
--- Host:                         192.168.0.181
--- Wersja serwera:               5.7.33-0ubuntu0.18.04.1 - (Ubuntu)
--- Serwer OS:                    Linux
--- HeidiSQL Wersja:              11.1.0.6116
--- --------------------------------------------------------
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
@@ -12,14 +5,11 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Zrzut struktury tabela TMS_DEV.remote_Device_Types
 CREATE TABLE IF NOT EXISTS `remote_Device_Types` (
   `Type_ID` int(11) NOT NULL AUTO_INCREMENT,
   `Name` varchar(30) NOT NULL DEFAULT '',
   PRIMARY KEY (`Type_ID`) USING BTREE
 ) ENGINE=FEDERATED DEFAULT CHARSET=utf8 CONNECTION='linked/Device_Types';
-
--- Table data not exported because this is FEDERATED table which holds its data in separate tables.
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

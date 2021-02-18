@@ -1,10 +1,3 @@
--- --------------------------------------------------------
--- Host:                         192.168.0.181
--- Wersja serwera:               5.7.33-0ubuntu0.18.04.1 - (Ubuntu)
--- Serwer OS:                    Linux
--- HeidiSQL Wersja:              11.1.0.6116
--- --------------------------------------------------------
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
@@ -12,7 +5,6 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Zrzut struktury procedura TMS_DEV.Synchronize_Update_Log
 DELIMITER //
 CREATE PROCEDURE `Synchronize_Update_Log`()
 BEGIN
@@ -20,12 +12,12 @@ BEGIN
 	SELECT rsr.*
 	FROM  TMS_DEV.remote_Sensor_Log rsr
 	LEFT JOIN TMS_DEV.Sensor_Log sr
-	ON sr.FW_IN_ID = rsr.FW_IN_ID
-	WHERE sr.FW_IN_ID IS NULL;
+	ON sr.ID = rsr.ID
+	WHERE sr.ID IS NULL;
 
 	IF FOUND_ROWS() > 0 THEN
 	INSERT INTO TMS_DEV.MultiLog (VALUE,Source)
-	SELECT CONCAT(FOUND_ROWS(),' rekordów zsynchronizowane'),'SynchroFW_IN';
+	SELECT CONCAT(FOUND_ROWS(),' rekordów zsynchronizowane'),'SynchroUL';
 	END IF;
 END//
 DELIMITER ;

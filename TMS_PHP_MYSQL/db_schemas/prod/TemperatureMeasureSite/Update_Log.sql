@@ -14,14 +14,16 @@
 
 -- Zrzut struktury tabela TMS.Update_Log
 CREATE TABLE IF NOT EXISTS `Update_Log` (
+  `ID` int(11) NOT NULL,
   `FW_IN_ID` int(11) NOT NULL,
   `Date` int(11) DEFAULT NULL,
-  `Status` varchar(30) DEFAULT NULL
+  `Status` varchar(30) DEFAULT NULL,
+  `Device_ID` int(11) DEFAULT NULL,
+  `Error_Value` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Zrzucanie danych dla tabeli TMS.Update_Log: ~0 rows (około)
-/*!40000 ALTER TABLE `Update_Log` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Update_Log` ENABLE KEYS */;
+-- Eksport danych został odznaczony.
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
