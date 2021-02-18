@@ -1,6 +1,6 @@
 -- --------------------------------------------------------
 -- Host:                         192.168.0.181
--- Wersja serwera:               5.7.32-0ubuntu0.18.04.1 - (Ubuntu)
+-- Wersja serwera:               5.7.33-0ubuntu0.18.04.1 - (Ubuntu)
 -- Serwer OS:                    Linux
 -- HeidiSQL Wersja:              11.1.0.6116
 -- --------------------------------------------------------
@@ -12,20 +12,14 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Zrzut struktury tabela TMS_DEV.Devices
-CREATE TABLE IF NOT EXISTS `Devices` (
-  `Device_ID` int(11) NOT NULL AUTO_INCREMENT,
-  `User_ID` int(11) DEFAULT NULL,
-  `Mac_Address` varchar(30) NOT NULL DEFAULT '',
-  `Password` varchar(30) NOT NULL DEFAULT '',
-  `Current_FW` int(11) DEFAULT NULL,
-  `Device_Type` int(11) DEFAULT NULL,
-  PRIMARY KEY (`Device_ID`),
-  KEY `User_ID` (`User_ID`),
-  CONSTRAINT `FK_Devices_Users` FOREIGN KEY (`User_ID`) REFERENCES `Users` (`User_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+-- Zrzut struktury tabela TMS_DEV.remote_Update_Log
+CREATE TABLE IF NOT EXISTS `remote_Update_Log` (
+  `FW_IN_ID` int(11) NOT NULL,
+  `Date` int(11) DEFAULT NULL,
+  `Status` varchar(30) CHARACTER SET latin1 DEFAULT NULL
+) ENGINE=FEDERATED DEFAULT CHARSET=utf8 CONNECTION='linked/Update_Log';
 
--- Eksport danych został odznaczony.
+-- Table data not exported because this is FEDERATED table which holds its data in separate tables.
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
