@@ -9,9 +9,12 @@ CREATE TABLE IF NOT EXISTS `Firmware_Instances` (
   `FW_IN_ID` int(11) NOT NULL AUTO_INCREMENT,
   `FW_Next` int(11) DEFAULT NULL,
   `FW_ID` int(11) NOT NULL,
+  `Device_Type` int(11) NOT NULL,
   PRIMARY KEY (`FW_IN_ID`) USING BTREE,
   KEY `FK_Firmware_Instances_Firmwares` (`FW_ID`),
   KEY `FK_Firmware_Instances_Firmware_Instances` (`FW_Next`),
+  KEY `FK_Firmware_Instances_Device_Types` (`Device_Type`),
+  CONSTRAINT `FK_Firmware_Instances_Device_Types` FOREIGN KEY (`Device_Type`) REFERENCES `Device_Types` (`Type_ID`),
   CONSTRAINT `FK_Firmware_Instances_Firmware_Instances` FOREIGN KEY (`FW_Next`) REFERENCES `Firmware_Instances` (`FW_IN_ID`),
   CONSTRAINT `FK_Firmware_Instances_Firmwares` FOREIGN KEY (`FW_ID`) REFERENCES `Firmwares` (`FW_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

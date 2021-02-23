@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS `Devices` (
   `Current_FW` int(11) DEFAULT NULL,
   `Device_Type` int(11) DEFAULT NULL,
   `Updates_Disabled_Date` timestamp NULL DEFAULT NULL,
+  `Firmware_AutoUpdate` bit(1) DEFAULT b'0',
   PRIMARY KEY (`Device_ID`),
   KEY `User_ID` (`User_ID`),
   KEY `FK_Devices_Device_Types` (`Device_Type`),
