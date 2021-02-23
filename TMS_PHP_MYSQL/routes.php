@@ -21,15 +21,15 @@ $startDate = $_GET['StartDate'];
 $endDate = $_GET['EndDate'];
 $Sensor_ID = $_GET['Sensor_ID'];
 
-if($ApiVersion_P != null)
-{
-    echo "ApiVersion: " . $ApiVersion_P . "\r\n"; 
-}
+// if($ApiVersion_P != null)
+// {
+//     echo "ApiVersion: " . $ApiVersion_P . "\r\n"; 
+// }
 
-if($Sensor_PIN != null)
-{
-    echo "Sensor_PIN: " . $Sensor_PIN . "\r\n";
-}
+// if($Sensor_PIN != null)
+// {
+//     echo "Sensor_PIN: " . $Sensor_PIN . "\r\n";
+// }
 
 
 

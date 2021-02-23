@@ -1,0 +1,34 @@
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+DELIMITER //
+CREATE PROCEDURE `Handle_Update_Log`(
+	IN `status` VARCHAR(50),
+	IN `error_value` VARCHAR(50),
+	IN `mac` VARCHAR(50),
+	IN `pass` VARCHAR(50)
+)
+BEGIN
+
+INSERT INTO Update_Log
+SELECT null,fwi.FW_IN_ID,NOW(),status,Device_ID,error_value
+FROM Devices dv
+JOIN Device_Types dvt ON dv.Device_Type = dvt.Type_ID
+JOIN Firmware_Instances fwi ON fwi.FW_IN_ID = dv.Current_FW
+JOIN Firmware_Instances fwN ON fwN.FW_IN_ID = fwi.FW_Next
+JOIN Firmwares fw ON fw.FW_ID = fwN.FW_ID
+JOIN Firmware_Versions fwv ON fw.FW_VER = fwv.FW_VER_ID 
+WHERE Mac_Address = mac AND PASSWORD = pass
+AND NOT (Updates_Disabled_Date IS not NULL AND Updates_Disabled_Date > NOW());
+
+END//
+DELIMITER ;
+
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;

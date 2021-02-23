@@ -6,9 +6,9 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 CREATE TABLE IF NOT EXISTS `Update_Log` (
-  `ID` int(11) NOT NULL,
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
   `FW_IN_ID` int(11) NOT NULL,
-  `Date` int(11) DEFAULT NULL,
+  `Date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `Status` varchar(30) DEFAULT NULL,
   `Device_ID` int(11) DEFAULT NULL,
   `Error_Value` varchar(50) DEFAULT NULL,
