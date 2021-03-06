@@ -6,7 +6,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 DELIMITER //
-CREATE PROCEDURE `Handle_Update_Log`(
+CREATE PROCEDURE `Handle_Device_Log`(
 	IN `status` VARCHAR(50),
 	IN `error_value` VARCHAR(50),
 	IN `mac` VARCHAR(50),
@@ -14,7 +14,7 @@ CREATE PROCEDURE `Handle_Update_Log`(
 )
 BEGIN
 
-INSERT INTO Update_Log
+INSERT INTO Device_Log
 SELECT null,fwi.FW_IN_ID,NOW(),status,Device_ID,error_value
 FROM Devices dv
 JOIN Device_Types dvt ON dv.Device_Type = dvt.Type_ID
