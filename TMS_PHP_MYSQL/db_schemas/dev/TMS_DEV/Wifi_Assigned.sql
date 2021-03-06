@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS `Wifi_Assigned` (
   `Assignation_ID` int(11) NOT NULL AUTO_INCREMENT,
   `WIFI_ID` int(11) NOT NULL DEFAULT '0',
   `Device_ID` int(11) NOT NULL DEFAULT '0',
+  `Active` bit(1) DEFAULT b'1',
   PRIMARY KEY (`Assignation_ID`),
   KEY `FK__Wifi_Networks` (`WIFI_ID`),
   KEY `FK__Devices` (`Device_ID`),
