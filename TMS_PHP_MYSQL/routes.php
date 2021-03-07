@@ -1,5 +1,8 @@
 <?php
 
+session_start();
+
+
 $action = $_GET['action'];
 
 $ApiVersion_G = $_GET['ApiVersion'];
@@ -21,16 +24,12 @@ $startDate = $_GET['StartDate'];
 $endDate = $_GET['EndDate'];
 $Sensor_ID = $_GET['Sensor_ID'];
 
-if($ApiVersion_P != null)
-{
-    echo "ApiVersion: " . $ApiVersion_P . "\r\n"; 
-}
 
-if($Sensor_PIN != null)
-{
-    echo "Sensor_PIN: " . $Sensor_PIN . "\r\n";
-}
-
+$UserName_P = $_POST['UserName'];
+$Name_P = $_POST['Name'];
+$Surname_P = $_POST['Surname'];
+$Email_P = $_POST['Email'];
+$Pass_P = $_POST['Password'];
 
 
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -320,6 +319,146 @@ if ($action == 'showAveragedData') {
 }
 if ($action == 'status') {
 	echo '[{"status": "Working"}]';
+}
+
+if ($action == 'register' && $Name_P != null && $Surname_P != null && $UserName_P != null && $Email_P != null && $Pass_P != null) {
+	$stmt = $conn->prepare("SELECT User_ID FROM Users WHERE UserName = ?");
+	if(!$stmt)
+    {   
+		log_Error("validate username prepare failed");
+		log_Error($UserName_P);
+		die('[{"error": "Internal Error"}]');
+    }
+
+    $stmt->bind_param("s", $UserName_P);
+    if ($stmt->execute()) {
+        $result = $stmt->get_result();
+
+        $resultArray = array();
+        if ($result->num_rows > 0) {
+			die('[{"error": "Username_Already_Exists"}]');
+        }
+    } else {
+        log_Error("register statement execute failed");
+		die('[{"error": "Internal Error"}]');
+    }
+	
+	$stmt = $conn->prepare("insert into Users ( UserName, Name, Surname, Email, Password, API_KEY, Session_ID, Last_action_date ) values (?, ?, ?, ?, ?, create_apikey(), ?, now())");
+	if(!$stmt)
+    {
+	    log_Error("register prepare failed");
+		log_Error($UserName_P,',', $Name_P,',', $Surname_P,',', $Email_P,',', $Pass_P);
+		die('[{"status": "Internal Error"}]');
+    }
+
+    $stmt->bind_param("ssssss", $UserName_P, $Name_P, $Surname_P, $Email_P, $Pass_P, session_id());
+    if (!$stmt->execute()) {
+        log_Error("register statement execute failed");
+		die('[{"error": "Internal Error"}]');
+    }
+
+	$stmt = $conn->prepare("SELECT User_ID,API_KEY FROM Users WHERE UserName = ?");
+	if(!$stmt)
+    {
+		log_Error("get user_ID from new created user PREPARE FAILED");
+		log_Error($UserName_P);
+		die('[{"error": "Internal Error"}]');
+    }
+
+    $stmt->bind_param("s", $UserName_P);
+    if ($stmt->execute()) {
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+			$row = $result->fetch_assoc();
+			session_regenerate_id();
+			$_SESSION['User_ID'] = $row['User_ID'];
+			$_SESSION['API_KEY'] = $row['API_KEY'];
+			$arr = array();
+			$arr['Session_ID'] = session_id();
+			$arr['API_KEY'] = $row['API_KEY'];
+			update_last_action_date($conn);
+			die('['.json_encode($arr).']');
+		}
+		else 
+		{
+			log_Error("register statement execute failed");
+			die('[{"error": "Internal Error"}]');
+		}
+    } else {
+        log_Error("register statement execute failed");
+		die('[{"error": "Internal Error"}]');
+    }
+}
+
+if ($action == 'login' && $UserName_P != null && $Pass_P != null) {
+	
+	$stmt = $conn->prepare("SELECT User_ID,API_KEY FROM Users WHERE UserName = ? and Password = ?");
+	if(!$stmt)
+    {
+		log_Error("get user data to login PREPARE FAILED");
+		log_Error($UserName_P);
+		die('[{"error": "Internal Error"}]');
+    }
+
+    $stmt->bind_param("ss", $UserName_P, $Pass_P);
+    if ($stmt->execute()) {
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+			session_regenerate_id();
+			$_SESSION['User_ID'] = $row['User_ID'];
+			$_SESSION['API_KEY'] = $row['API_KEY'];
+			$arr = array();
+			$arr['Session_ID'] = session_id();
+			$arr['API_KEY'] = $row['API_KEY'];
+			update_last_action_date($conn);
+			die('['.json_encode($arr).']');
+		}
+		else 
+		{
+			log_Error("login statement execute failed");
+			die('[{"error": "Internal Error"}]');
+		}
+    } else {
+        log_Error("login statement execute failed");
+		die('[{"error": "Internal Error"}]');
+    }
+}
+
+if ($action == 'logout' && session_id() != null && $_SESSION['User_ID'] != null && $_SESSION['API_KEY'] != null) {
+	$stmt = $conn->prepare("update Users set Session_ID = null, Last_action_date = now() WHERE User_ID = ? and API_KEY = ?");
+	if(!$stmt)
+    {
+		log_Error("logout update PREPARE FAILED");
+		log_Error($_SESSION['User_ID'], $_SESSION['API_KEY']);
+		die('[{"error": "Internal Error"}]');
+    }
+
+    $stmt->bind_param("ss", $_SESSION['User_ID'], $_SESSION['API_KEY']);
+    if ($stmt->execute()) {
+        session_destroy();
+		die('[{"status": "Logout Successful"}]');
+    } else {
+        log_Error("logout update execute failed");
+		die('[{"error": "Internal Error"}]');
+    }
+}
+
+
+
+function update_last_action_date( $conn )
+{
+    $stmt = $conn->prepare("UPDATE Users SET Last_Action_Date = NOW(), Session_ID = ? WHERE User_ID = ?");
+	if(!$stmt)
+    {
+	    log_Error("update_last_action_date prepare failed");
+		die('[{"status": "Internal Error"}]');
+    }
+    $stmt->bind_param("ss", session_id(), $_SESSION['User_ID']);
+    if (!$stmt->execute()) {
+        log_Error("update_last_action_date execute failed");
+		die('[{"error": "Internal Error"}]');
+    }
 }
 
 $conn->close();
