@@ -15,6 +15,13 @@ CREATE TABLE IF NOT EXISTS `Users` (
   PRIMARY KEY (`User_ID`),
   UNIQUE KEY `API_KEY` (`API_KEY`),
   UNIQUE KEY `UserName` (`UserName`),
+  `Email` varchar(50) NOT NULL,
+  `Session_ID` varchar(50) DEFAULT NULL,
+  `Last_action_date` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`User_ID`),
+  UNIQUE KEY `API_KEY` (`API_KEY`),
+  UNIQUE KEY `UserName` (`UserName`),
+  UNIQUE KEY `Email` (`Email`),
   KEY `Password` (`Password`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
