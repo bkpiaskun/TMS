@@ -39,12 +39,14 @@ if ($action == 'GetNextFW' && $mac != null && $pass != null) {
     JOIN Firmware_Instances fwN ON fwN.FW_IN_ID = fwi.FW_Next
     JOIN Firmwares fw ON fw.FW_ID = fwN.FW_ID
     JOIN Firmware_Versions fwv ON fw.FW_VER = fwv.FW_VER_ID
-    WHERE Mac_Address = '?' AND PASSWORD = '?'
+    WHERE Mac_Address = ? AND PASSWORD = ?
     AND NOT (Updates_Disabled_Date IS not NULL AND Updates_Disabled_Date > NOW());");
 	if(!$stmt)
+    {
         log_Error("GetNextFW prepare failed");
 		die('[{"status": "Error"}]');
-    
+    }
+
     $stmt->bind_param("ss", $mac, $pass);
     
     if ($stmt->execute()) {
@@ -131,4 +133,7 @@ function log_Error( $message )
         fclose($fp);
     }
 }
+
+
+
 ?>
