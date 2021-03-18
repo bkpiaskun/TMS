@@ -30,6 +30,7 @@ $Name_P = $_POST['Name'];
 $Surname_P = $_POST['Surname'];
 $Email_P = $_POST['Email'];
 $Pass_P = $_POST['Password'];
+$ApiKey_P = $_POST['ApiKey'];
 
 
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -325,8 +326,8 @@ if ($action == 'register' && $Name_P != null && $Surname_P != null && $UserName_
 	$stmt = $conn->prepare("SELECT User_ID FROM Users WHERE UserName = ?");
 	if(!$stmt)
     {   
-		log_Error("validate username prepare failed");
-		log_Error($UserName_P);
+		log("validate username prepare failed",$Error_LOG_filename);
+		log($UserName_P,$Error_LOG_filename);
 		die('[{"error": "Internal Error"}]');
     }
 
@@ -339,29 +340,29 @@ if ($action == 'register' && $Name_P != null && $Surname_P != null && $UserName_
 			die('[{"error": "Username_Already_Exists"}]');
         }
     } else {
-        log_Error("register statement execute failed");
+        log("register statement execute failed",$Error_LOG_filename);
 		die('[{"error": "Internal Error"}]');
     }
 	
 	$stmt = $conn->prepare("insert into Users ( UserName, Name, Surname, Email, Password, API_KEY, Session_ID, Last_action_date ) values (?, ?, ?, ?, ?, create_apikey(), ?, now())");
 	if(!$stmt)
     {
-	    log_Error("register prepare failed");
-		log_Error($UserName_P,',', $Name_P,',', $Surname_P,',', $Email_P,',', $Pass_P);
+	    log("register prepare failed",$Error_LOG_filename);
+		log($UserName_P.','. $Name_P.','.$Surname_P.','. $Email_P.','. $Pass_P,$Error_LOG_filename);
 		die('[{"status": "Internal Error"}]');
     }
 
     $stmt->bind_param("ssssss", $UserName_P, $Name_P, $Surname_P, $Email_P, $Pass_P, session_id());
     if (!$stmt->execute()) {
-        log_Error("register statement execute failed");
+        log("register statement execute failed",$Error_LOG_filename);
 		die('[{"error": "Internal Error"}]');
     }
 
 	$stmt = $conn->prepare("SELECT User_ID,API_KEY FROM Users WHERE UserName = ?");
 	if(!$stmt)
     {
-		log_Error("get user_ID from new created user PREPARE FAILED");
-		log_Error($UserName_P);
+		log("get user_ID from new created user PREPARE FAILED",$Error_LOG_filename);
+		log($UserName_P,$Error_LOG_filename);
 		die('[{"error": "Internal Error"}]');
     }
 
@@ -381,11 +382,11 @@ if ($action == 'register' && $Name_P != null && $Surname_P != null && $UserName_
 		}
 		else 
 		{
-			log_Error("register statement execute failed");
+			log("register statement execute failed",$Error_LOG_filename);
 			die('[{"error": "Internal Error"}]');
 		}
     } else {
-        log_Error("register statement execute failed");
+        log("register statement execute failed",$Error_LOG_filename);
 		die('[{"error": "Internal Error"}]');
     }
 }
@@ -395,8 +396,8 @@ if ($action == 'login' && $UserName_P != null && $Pass_P != null) {
 	$stmt = $conn->prepare("SELECT User_ID,API_KEY FROM Users WHERE UserName = ? and Password = ?");
 	if(!$stmt)
     {
-		log_Error("get user data to login PREPARE FAILED");
-		log_Error($UserName_P);
+		log("get user data to login PREPARE FAILED",$Error_LOG_filename);
+		log($UserName_P,$Error_LOG_filename);
 		die('[{"error": "Internal Error"}]');
     }
 
@@ -416,11 +417,11 @@ if ($action == 'login' && $UserName_P != null && $Pass_P != null) {
 		}
 		else 
 		{
-			log_Error("login statement execute failed");
-			die('[{"error": "Internal Error"}]');
+			log("login statement execute failed",$Error_LOG_filename);
+			die('[{"status": "Credentials Wrong"}]');
 		}
     } else {
-        log_Error("login statement execute failed");
+        log("login statement execute failed",$Error_LOG_filename);
 		die('[{"error": "Internal Error"}]');
     }
 }
@@ -429,8 +430,8 @@ if ($action == 'logout' && session_id() != null && $_SESSION['User_ID'] != null 
 	$stmt = $conn->prepare("update Users set Session_ID = null, Last_action_date = now() WHERE User_ID = ? and API_KEY = ?");
 	if(!$stmt)
     {
-		log_Error("logout update PREPARE FAILED");
-		log_Error($_SESSION['User_ID'], $_SESSION['API_KEY']);
+		log("logout update PREPARE FAILED",$Error_LOG_filename);
+		log($_SESSION['User_ID'].$_SESSION['API_KEY'],$Error_LOG_filename);
 		die('[{"error": "Internal Error"}]');
     }
 
@@ -439,24 +440,113 @@ if ($action == 'logout' && session_id() != null && $_SESSION['User_ID'] != null 
         session_destroy();
 		die('[{"status": "Logout Successful"}]');
     } else {
-        log_Error("logout update execute failed");
+        log("logout update execute failed",$Error_LOG_filename);
 		die('[{"error": "Internal Error"}]');
     }
 }
 
+if ($action == 'showSensorsDetails' && $UserName_P != null && $ApiKey_P != null) {
+	$sql = "SELECT Sensor_ID,Sensor_Name,dv.Password,fwv.FW_VER_NAME as 'Firmware_Version',dv.Device_ID,dvt.Name as 'Device_Type',dv.Firmware_AutoUpdate,dv.Webserver_URL,dv.Update_URL
+	FROM Sensors ss
+	JOIN Devices dv
+	on dv.Device_ID = ss.Device_ID
+	JOIN Device_Types dvt
+	ON dv.Device_Type = dvt.Type_ID
+	JOIN Users us
+	ON dv.User_ID = us.User_ID
+	JOIN Firmware_Instances fwi
+	ON dv.Current_FW = fwi.FW_IN_ID
+	JOIN Firmwares fw
+	ON fwi.FW_ID = fw.FW_ID
+	JOIN Firmware_Versions fwv
+	ON fw.FW_VER = fwv.FW_VER_ID
+	WHERE us.UserName = ?
+	AND us.API_KEY = ?";
 
+	$stmt = $conn->prepare($sql);
+	if(!$stmt)
+	{
+		log("showSensorDetails PREPARE FAILED",$Error_LOG_filename);
+		die('[{"error": "Internal Error"}]');
+	}
+	$stmt->bind_param("ss", $UserName_P, $ApiKey_P);
+	$resultArray = array();
+    if ($stmt->execute()) {
+		$result = $stmt->get_result();
+		if ($result->num_rows > 0) {
+			while ($row = $result->fetch_assoc()) {
+				$resultArray[] = $row;
+			}
+		} else {
+			log("Sensors not found",$Error_LOG_filename);
+			die('[{"status": "No_Sensors_Available"}]');
+		}		
+	}
+	else {
+		log("showSensorsDetails execute FAILED",$Error_LOG_filename);
+		die('[{"error": "Internal Error"}]');
+	}
+	update_last_action_date($conn);
+	echo json_encode($resultArray);
+}
+
+if ($action == 'showSensorDetails' && $UserName_P != null && $ApiKey_P != null && $Sensor_ID != null) {
+	$sql = "SELECT Sensor_ID,Sensor_Name,dv.Password,fwv.FW_VER_NAME as 'Firmware_Version',dv.Device_ID,dvt.Name as 'Device_Type',dv.Firmware_AutoUpdate,dv.Webserver_URL,dv.Update_URL
+	FROM Sensors ss
+	JOIN Devices dv
+	on dv.Device_ID = ss.Device_ID
+	JOIN Device_Types dvt
+	ON dv.Device_Type = dvt.Type_ID
+	JOIN Users us
+	ON dv.User_ID = us.User_ID
+	JOIN Firmware_Instances fwi
+	ON dv.Current_FW = fwi.FW_IN_ID
+	JOIN Firmwares fw
+	ON fwi.FW_ID = fw.FW_ID
+	JOIN Firmware_Versions fwv
+	ON fw.FW_VER = fwv.FW_VER_ID
+	WHERE us.UserName = ?
+	AND us.API_KEY = ?
+	AND ss.Sensor_ID = ?";
+
+	$stmt = $conn->prepare($sql);
+	if(!$stmt)
+	{
+		log("showSensorDetails PREPARE FAILED",$Error_LOG_filename);
+		die('[{"error": "Internal Error"}]');
+	}
+	$stmt->bind_param("sss", $UserName_P, $ApiKey_P, $Sensor_ID);
+	$resultArray = array();
+    if ($stmt->execute()) {
+		$result = $stmt->get_result();
+		if ($result->num_rows > 0) {
+			while ($row = $result->fetch_assoc()) {
+				$resultArray[] = $row;
+			}
+		} else {
+			log("Sensors not found",$Error_LOG_filename);
+			die('[{"status": "Sensor_Not_Found"}]');
+		}		
+	}
+	else {
+		log("showSensorsDetails execute FAILED",$Error_LOG_filename);
+		die('[{"error": "Internal Error"}]');
+	}
+	update_last_action_date($conn);
+	echo json_encode($resultArray);
+}
 
 function update_last_action_date( $conn )
 {
     $stmt = $conn->prepare("UPDATE Users SET Last_Action_Date = NOW(), Session_ID = ? WHERE User_ID = ?");
 	if(!$stmt)
     {
-	    log_Error("update_last_action_date prepare failed");
+	    log("update_last_action_date prepare failed",$Error_LOG_filename);
 		die('[{"status": "Internal Error"}]');
     }
     $stmt->bind_param("ss", session_id(), $_SESSION['User_ID']);
     if (!$stmt->execute()) {
-        log_Error("update_last_action_date execute failed");
+        log("update_last_action_date execute failed",$Error_LOG_filename);
 		die('[{"error": "Internal Error"}]');
     }
 }
