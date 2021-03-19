@@ -18,6 +18,10 @@ $mac = $_POST['MAC'];
 $log_result = $_POST['Log_Result'];
 $log_error = $_POST['Log_Error'];
 
+$wifi_network = $_POST['Wifi_Network'];
+$Sensor_ID_P = $_POST['Sensor_ID'];
+
+
 $UserName = $_GET['UserName'];
 $ApiKey = $_GET['ApiKey'];
 $startDate = $_GET['StartDate'];
@@ -120,6 +124,40 @@ if ($action == 'getWIFINETWORKS' && $mac != null && $pass != null) {
 
     echo json_encode($resultArray);
 }
+if ($action == 'STARTUP' && $wifi_network && $mac != null && $pass != null) {
+    $stmt = $conn->prepare("call Handle_Device_Log(?,?,?,?);");
+    if(!$stmt)
+    {
+        log_Error("STARTUP HDL statement prepare failed");
+        die('[{"status": "Error"}]');
+    }
+    
+    $stmt->bind_param("ssss", $action, $wifi_network, $mac, $pass);
+    if ($stmt->execute()) {
+        die('[{"status": "OK"}]');
+    } else {
+        log_Error("STARTUP HDL statement execute failed");
+        log_Error("Error: " . $sql . "<br>" . $conn->error);
+        die('[{"status": "Error"}]');
+    }
+}
+if ($action == 'reportSensorFailure' && $Sensor_ID_P != null && $mac != null && $pass != null) {
+    $stmt = $conn->prepare("call Handle_Device_Log(?,?,?,?);");
+    if(!$stmt)
+    {
+        log_Error("STARTUP HDL statement prepare failed");
+        die('[{"status": "Error"}]');
+    }
+    $error = "Read_Fail";
+    $stmt->bind_param("ssss", $error, $Sensor_ID_P, $mac, $pass);
+    if ($stmt->execute()) {
+        die('[{"status": "OK"}]');
+    } else {
+        log_Error("STARTUP HDL statement execute failed");
+        log_Error("Error: " . $sql . "<br>" . $conn->error);
+        die('[{"status": "Error"}]');
+    }
+}
 
 
 
@@ -133,7 +171,5 @@ function log_Error( $message )
         fclose($fp);
     }
 }
-
-
 
 ?>
