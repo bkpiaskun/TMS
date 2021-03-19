@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS `Devices` (
   `Device_Type` int(11) DEFAULT NULL,
   `Updates_Disabled_Date` timestamp NULL DEFAULT NULL,
   `Firmware_AutoUpdate` bit(1) DEFAULT b'0',
+  `Webserver_URL` varchar(150) DEFAULT '192.168.0.181',
+  `Update_URL` varchar(150) DEFAULT '192.168.0.181',
   PRIMARY KEY (`Device_ID`),
   KEY `User_ID` (`User_ID`),
   KEY `FK_Devices_Device_Types` (`Device_Type`),

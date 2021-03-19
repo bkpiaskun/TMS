@@ -21,7 +21,6 @@ if NEW.Status = "fail" AND NEW.Error_Value = "eeprom_size_not_enough" then
 	UPDATE Devices SET Updates_Disabled_Date = NOW() + INTERVAL 3 DAY WHERE Device_ID = NEW.Device_ID;
 END if;
 
-
 END//
 DELIMITER ;
 SET SQL_MODE=@OLDTMP_SQL_MODE;

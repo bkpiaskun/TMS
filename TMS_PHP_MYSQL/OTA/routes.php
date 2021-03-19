@@ -158,7 +158,35 @@ if ($action == 'reportSensorFailure' && $Sensor_ID_P != null && $mac != null && 
         die('[{"status": "Error"}]');
     }
 }
+if ($action == 'getEEPROM' && $mac != null && $pass != null) {
+    $stmt = $conn->prepare("CALL GetEEPROM( ?, ? )");
+    if(!$stmt)
+    {
+        log_Error("GetEEPROM statement prepare failed");
+        die('[{"status": "Error"}]');
+    }
 
+    $stmt->bind_param("ss", $mac, $pass);
+    if ($stmt->execute()) {
+        $result = $stmt->get_result();
+
+        $resultArray = array();
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $resultArray[] = $row;
+            }
+        }
+        else
+        {
+            die('[{"status": "Error"}]');
+        }
+    } else {
+        log_Error("GetEEPROM statement execute failed");
+        log_Error("Error: " . $sql . "<br>" . $conn->error);
+        die('[{"status": "Error"}]');
+    }
+    echo json_encode($resultArray);
+}
 
 
 

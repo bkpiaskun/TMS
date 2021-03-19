@@ -10,9 +10,12 @@ CREATE TABLE IF NOT EXISTS `Sensors` (
   `Device_ID` int(11) NOT NULL DEFAULT '0',
   `Sensor_Name` varchar(30) NOT NULL,
   `PIN` int(11) DEFAULT NULL,
+  `Sensor_Type` int(11) DEFAULT NULL,
   PRIMARY KEY (`Sensor_ID`) USING BTREE,
   KEY `Device_ID` (`Device_ID`),
-  CONSTRAINT `FK_Sensors_Devices` FOREIGN KEY (`Device_ID`) REFERENCES `Devices` (`Device_ID`)
+  KEY `FK_Sensors_Sensor_Types` (`Sensor_Type`),
+  CONSTRAINT `FK_Sensors_Devices` FOREIGN KEY (`Device_ID`) REFERENCES `Devices` (`Device_ID`),
+  CONSTRAINT `FK_Sensors_Sensor_Types` FOREIGN KEY (`Sensor_Type`) REFERENCES `Sensor_Types` (`Type_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
