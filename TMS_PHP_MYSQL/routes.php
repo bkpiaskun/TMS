@@ -24,23 +24,12 @@ $startDate = $_GET['StartDate'];
 $endDate = $_GET['EndDate'];
 $Sensor_ID = $_GET['Sensor_ID'];
 
-// if($ApiVersion_P != null)
-// {
-//     echo "ApiVersion: " . $ApiVersion_P . "\r\n"; 
-// }
-
-// if($Sensor_PIN != null)
-// {
-//     echo "Sensor_PIN: " . $Sensor_PIN . "\r\n";
-// }
-
 $UserName_P = $_POST['UserName'];
 $Name_P = $_POST['Name'];
 $Surname_P = $_POST['Surname'];
 $Email_P = $_POST['Email'];
 $Pass_P = $_POST['Password'];
 $ApiKey_P = $_POST['ApiKey'];
-
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
@@ -109,14 +98,33 @@ if($action == null){
 	}
 }
 if ($action == 'LAST') {
-	$result = $conn->query("Select * from Measurements_With_Differences");
-	$resultArray = array();
-	if ($result->num_rows > 0) {
-		while ($row = $result->fetch_assoc()) {
-			$resultArray[] = $row;
-		}
-	}
-	echo json_encode($resultArray);
+	$stmt = $conn->prepare("Select * from Measurements_With_Differences");
+    if(!$stmt)
+    {
+        log_Error("LAST statement prepare failed");
+        die('[{"status": "Error"}]');
+    }
+
+    $stmt->bind_param("ss", $mac, $pass);
+    if ($stmt->execute()) {
+        $result = $stmt->get_result();
+
+        $resultArray = array();
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $resultArray[] = $row;
+            }
+        }
+        else
+        {
+            die('[{"status": "No measurements"}]');
+        }
+    } else {
+        log_Error("LAST statement execute failed");
+        log_Error("Error: " . $sql . "<br>" . $conn->error);
+        die('[{"status": "Error"}]');
+    }
+    echo json_encode($resultArray, JSON_UNESCAPED_UNICODE|JSON_INVALID_UTF8_IGNORE);
 }
 if ($action == 'MyLasts') {
 	$sql = "SELECT *
@@ -252,7 +260,7 @@ if ($action == 'MyLasts') {
 			$resultArray[] = $row;
 		}
 	}
-	echo json_encode($resultArray);
+	echo json_encode($resultArray, JSON_UNESCAPED_UNICODE|JSON_INVALID_UTF8_IGNORE);
 }
 if ($action == 'validate') {
 	$UserValidation = "Failure";
@@ -266,7 +274,7 @@ if ($action == 'validate') {
 			}
 		}
 	}
-	echo json_encode($UserValidation);
+	echo json_encode($UserValidation, JSON_UNESCAPED_UNICODE|JSON_INVALID_UTF8_IGNORE);
 }
 if ($action == 'showSensors') {
 	$sql = "SELECT Sensor_ID,Sensor_Name
@@ -284,7 +292,7 @@ if ($action == 'showSensors') {
 			$resultArray[] = $row;
 		}
 	}
-	echo json_encode($resultArray);
+	echo json_encode($resultArray, JSON_UNESCAPED_UNICODE|JSON_INVALID_UTF8_IGNORE);
 }
 if ($action == 'showSensorAveraged') {
 
@@ -317,7 +325,7 @@ if ($action == 'showSensorAveraged') {
 			$resultArray[] = $row;
 		}
 	}
-	echo json_encode($resultArray);
+	echo json_encode($resultArray, JSON_UNESCAPED_UNICODE|JSON_INVALID_UTF8_IGNORE);
 }
 if ($action == 'showAveragedData') {
 
@@ -359,7 +367,7 @@ if ($action == 'showAveragedData') {
 			$resultArray[] = $row;
 		}
 	}
-	echo json_encode($resultArray);
+	echo json_encode($resultArray, JSON_UNESCAPED_UNICODE|JSON_INVALID_UTF8_IGNORE);
 }
 if ($action == 'status') {
 	echo '[{"status": "Working"}]';
@@ -421,7 +429,7 @@ if ($action == 'register' && $Name_P != null && $Surname_P != null && $UserName_
 			$arr['Session_ID'] = session_id();
 			$arr['API_KEY'] = $row['API_KEY'];
 			update_last_action_date($conn);
-			die('['.json_encode($arr).']');
+			die('['.json_encode($arr, JSON_UNESCAPED_UNICODE|JSON_INVALID_UTF8_IGNORE).']');
 		}
 		else 
 		{
@@ -456,7 +464,7 @@ if ($action == 'login' && $UserName_P != null && $Pass_P != null) {
 			$arr['Session_ID'] = session_id();
 			$arr['API_KEY'] = $row['API_KEY'];
 			update_last_action_date($conn);
-			die('['.json_encode($arr).']');
+			die('['.json_encode($arr, JSON_UNESCAPED_UNICODE|JSON_INVALID_UTF8_IGNORE).']');
 		}
 		else 
 		{
@@ -530,7 +538,7 @@ if ($action == 'showSensorsDetails' && $UserName_P != null && $ApiKey_P != null)
 		die('[{"error": "Internal Error"}]');
 	}
 	update_last_action_date($conn);
-	echo json_encode($resultArray);
+	echo json_encode($resultArray, JSON_UNESCAPED_UNICODE|JSON_INVALID_UTF8_IGNORE);
 }
 
 if ($action == 'showSensorDetails' && $UserName_P != null && $ApiKey_P != null && $Sensor_ID != null) {
@@ -576,7 +584,7 @@ if ($action == 'showSensorDetails' && $UserName_P != null && $ApiKey_P != null &
 		die('[{"error": "Internal Error"}]');
 	}
 	update_last_action_date($conn);
-	echo json_encode($resultArray);
+	echo json_encode($resultArray, JSON_UNESCAPED_UNICODE|JSON_INVALID_UTF8_IGNORE);
 }
 
 function update_last_action_date( $conn )
