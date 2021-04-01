@@ -8,14 +8,14 @@
 CREATE TABLE IF NOT EXISTS `Devices` (
   `Device_ID` int(11) NOT NULL AUTO_INCREMENT,
   `User_ID` int(11) DEFAULT NULL,
-  `Mac_Address` varchar(30) NOT NULL DEFAULT '',
-  `Password` varchar(30) NOT NULL DEFAULT '',
+  `Mac_Address` varchar(30) CHARACTER SET latin1 NOT NULL DEFAULT '',
+  `Password` varchar(30) CHARACTER SET latin1 NOT NULL DEFAULT '',
   `Current_FW` int(11) DEFAULT NULL,
   `Device_Type` int(11) DEFAULT NULL,
   `Updates_Disabled_Date` timestamp NULL DEFAULT NULL,
   `Firmware_AutoUpdate` bit(1) DEFAULT b'0',
-  `Webserver_URL` varchar(150) DEFAULT '192.168.0.181',
-  `Update_URL` varchar(150) DEFAULT '192.168.0.181',
+  `Webserver_URL` varchar(150) CHARACTER SET latin1 DEFAULT 'tms.server.org',
+  `Update_URL` varchar(150) CHARACTER SET latin1 DEFAULT 'tms.server.org',
   PRIMARY KEY (`Device_ID`),
   KEY `User_ID` (`User_ID`),
   KEY `FK_Devices_Device_Types` (`Device_Type`),
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `Devices` (
   CONSTRAINT `FK_Devices_Device_Types` FOREIGN KEY (`Device_Type`) REFERENCES `Device_Types` (`Type_ID`),
   CONSTRAINT `FK_Devices_Firmware_Instances` FOREIGN KEY (`Current_FW`) REFERENCES `Firmware_Instances` (`FW_IN_ID`),
   CONSTRAINT `FK_Devices_Users` FOREIGN KEY (`User_ID`) REFERENCES `Users` (`User_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

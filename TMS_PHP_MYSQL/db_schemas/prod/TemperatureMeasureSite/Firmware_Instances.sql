@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `Firmware_Instances` (
   CONSTRAINT `FK_Firmware_Instances_Device_Types` FOREIGN KEY (`Device_Type`) REFERENCES `Device_Types` (`Type_ID`),
   CONSTRAINT `FK_Firmware_Instances_Firmware_Instances` FOREIGN KEY (`FW_Next`) REFERENCES `Firmware_Instances` (`FW_IN_ID`),
   CONSTRAINT `FK_Firmware_Instances_Firmwares` FOREIGN KEY (`FW_ID`) REFERENCES `Firmwares` (`FW_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
