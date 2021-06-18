@@ -4,6 +4,7 @@
 #include <ESP8266HTTPClient.h>
 #include "EEPROM.h"
 #include <Ticker.h>
+#include <WiFiClient.h>
 
 #include "DHT22_lib.h"
 #include "DS18B20_lib.h"
@@ -12,6 +13,7 @@
 Ticker blinker;
 
 String serverAddress = "http://TMS.Server.org/";
+WiFiClient wifiClient;
 int port = 80;
 
 SensorLib *sensor_array[] =
@@ -76,6 +78,7 @@ void loop() {
   }
   if (Serial.available() && state == 0)
     state = 1;
+  delay(1000);
 }
 
 void TemperatureMeasurement()
@@ -105,10 +108,13 @@ bool PushDataToServer(ReadingDatagram data)
 {
 
   HTTPClient http;
-  http.begin(serverAddress); //HTTP
+  http.begin(wifiClient, serverAddress); //HTTP
   Serial.println(serverAddress);
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");
   int httpCode = http.POST(
+                   "AVG_Humidity=" + (String)data.AVG_Humidity + "&" +
+                   "Max_Humidity=" + (String)data.Max_Humidity + "&" +
+                   "Min_Humidity=" + (String)data.Min_Humidity + "&" +
                    "AVG_Temperature=" + (String)data.AVG_Temperature + "&" +
                    "Max_Temperature=" + (String)data.Max_Temperature + "&" +
                    "Min_Temperature=" + (String)data.Min_Temperature + "&" +

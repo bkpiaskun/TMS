@@ -1,10 +1,3 @@
--- --------------------------------------------------------
--- Host:                         192.168.0.181
--- Wersja serwera:               5.7.32-0ubuntu0.18.04.1 - (Ubuntu)
--- Serwer OS:                    Linux
--- HeidiSQL Wersja:              11.1.0.6116
--- --------------------------------------------------------
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
@@ -12,8 +5,6 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Zrzut struktury widok TMS.LAST_Measurements
--- Usuwanie tabeli tymczasowej i tworzenie ostatecznej struktury WIDOKU
 DROP TABLE IF EXISTS `LAST_Measurements`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `LAST_Measurements` AS select `sr`.`ID` AS `ID`,`ss`.`Sensor_Name` AS `Sensor_Name`,`sr`.`Timestamp_Of_Reading` AS `Timestamp_Of_Reading`,`sr`.`AVG_Humidity` AS `AVG_Humidity`,`sr`.`Max_Humidity` AS `Max_Humidity`,`sr`.`Min_Humidity` AS `Min_Humidity`,`sr`.`AVG_Temperature` AS `AVG_Temperature`,`sr`.`Max_Temperature` AS `Max_Temperature`,`sr`.`Min_Temperature` AS `Min_Temperature` from ((`TMS`.`Sensor_Readings` `sr` join (select max(`TMS`.`Sensor_Readings`.`ID`) AS `ID` from `TMS`.`Sensor_Readings` group by `TMS`.`Sensor_Readings`.`Sensor_ID`) `s` on((`sr`.`ID` = `s`.`ID`))) join `TMS`.`Sensors` `ss` on((`sr`.`Sensor_ID` = `ss`.`Sensor_ID`)));
 
