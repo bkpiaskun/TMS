@@ -3,12 +3,12 @@
 
 struct ReadingDatagram
 {
-  float AVG_Humidity;
-  float Max_Humidity;
-  float Min_Humidity;
-  float AVG_Temperature;
-  float Max_Temperature;
-  float Min_Temperature;
+  float AVG_Humidity = 0;
+  float Max_Humidity = 0;
+  float Min_Humidity = 0;
+  float AVG_Temperature = 0;
+  float Max_Temperature = 0;
+  float Min_Temperature = 0;
   int PIN;
 };
 
