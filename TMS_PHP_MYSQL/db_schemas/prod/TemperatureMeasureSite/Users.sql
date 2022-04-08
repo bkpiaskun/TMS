@@ -7,20 +7,21 @@
 
 CREATE TABLE IF NOT EXISTS `Users` (
   `User_ID` int(11) NOT NULL AUTO_INCREMENT,
-  `UserName` varchar(50) NOT NULL DEFAULT '0',
-  `Name` varchar(50) NOT NULL DEFAULT '0',
-  `Surname` varchar(50) NOT NULL DEFAULT '0',
-  `API_KEY` varchar(50) NOT NULL DEFAULT '0',
-  `Password` varchar(50) NOT NULL,
-  `Email` varchar(50) NOT NULL,
-  `Session_ID` varchar(50) DEFAULT NULL,
+  `UserName` varchar(50) CHARACTER SET utf8mb4 NOT NULL DEFAULT '0',
+  `Name` varchar(50) CHARACTER SET utf8mb4 NOT NULL DEFAULT '0',
+  `Surname` varchar(50) CHARACTER SET utf8mb4 NOT NULL DEFAULT '0',
+  `API_KEY` varchar(50) CHARACTER SET utf8mb4 NOT NULL DEFAULT '0',
+  `Password` varchar(50) CHARACTER SET utf8mb4 NOT NULL,
+  `Email` varchar(50) CHARACTER SET utf8mb4 NOT NULL,
+  `Session_ID` varchar(50) CHARACTER SET utf8mb4 DEFAULT NULL,
   `Last_action_date` timestamp NULL DEFAULT NULL,
+  `Creation_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`User_ID`),
   UNIQUE KEY `API_KEY` (`API_KEY`),
   UNIQUE KEY `UserName` (`UserName`),
   UNIQUE KEY `Email` (`Email`),
   KEY `Password` (`Password`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

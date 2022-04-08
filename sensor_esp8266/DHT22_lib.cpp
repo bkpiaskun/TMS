@@ -18,7 +18,8 @@ void DHT22_lib::MeasureTemp()
     Serial.print("Read DHT22 failed on pin:");
     Serial.print(pinDHT22);
     Serial.print(", err=");
-    Serial.println(err);
+    Serial.print(SimpleDHTErrCode(err));
+    Serial.print(","); Serial.println(SimpleDHTErrDuration(err));
   }
   else
   {
